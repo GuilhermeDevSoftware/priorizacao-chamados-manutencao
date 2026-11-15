@@ -1,0 +1,144 @@
+{
+  "origem": "Base inteiramente fictícia, criada para demonstração acadêmica; nenhum chamado real.",
+  "semente": 42,
+  "avaliacao_em": "Ambiente local (Python/nbclient)",
+  "politica_rotulos": "Política didática definida ANTES do treino: prioritário (1) se houver\nrisco à segurança OU interrupção de serviço essencial OU (pelo menos 40 pessoas\nafetadas E pelo menos 7 dias de espera) OU (recorrência E pelo menos 10 pessoas\nafetadas E pelo menos 14 dias de espera). Nos demais casos, normal (0).\nSegurança independe do número de pessoas: fiação exposta em local pouco usado\ncontinua prioritária. Os limiares de espera/impacto são escolhas pedagógicas,\nnão padrões técnicos universais. Em uso real devem ser pactuados com a instituição.\nServiço essencial significa indisponibilidade de água, energia, saneamento,\nalimentação ou acesso indispensável; equipamento auxiliar com alternativa não\né automaticamente essencial. O responsável sempre revisa a sugestão.",
+  "divisao": {
+    "base": {
+      "registros": 120,
+      "familias": 30,
+      "classes": {
+        "0": 57,
+        "1": 63
+      },
+      "proporcao_prioritaria": 0.525
+    },
+    "treino": {
+      "registros": 96,
+      "familias": 24,
+      "classes": {
+        "0": 47,
+        "1": 49
+      },
+      "proporcao_prioritaria": 0.5104166666666666
+    },
+    "teste": {
+      "registros": 24,
+      "familias": 6,
+      "classes": {
+        "0": 10,
+        "1": 14
+      },
+      "proporcao_prioritaria": 0.5833333333333334
+    }
+  },
+  "separacao_grupos": "StratifiedGroupKFold 5 folds, primeira partição fixa; famílias disjuntas",
+  "ajuste": {
+    "metodo": "GridSearchCV com StratifiedGroupKFold 4 folds exclusivamente no treino",
+    "criterio": "F2 da classe 1; empate favorece menor profundidade",
+    "melhor_max_depth": 6,
+    "profundidade_aprendida": 6,
+    "validacao_cruzada": [
+      {
+        "max_depth": 1,
+        "f2_medio": 0.2884615384615385,
+        "sensibilidade_media": 0.25,
+        "precisao_media": 0.75
+      },
+      {
+        "max_depth": 2,
+        "f2_medio": 0.6234335839598998,
+        "sensibilidade_media": 0.5769230769230769,
+        "precisao_media": 0.95
+      },
+      {
+        "max_depth": 3,
+        "f2_medio": 0.6371890821043363,
+        "sensibilidade_media": 0.5993589743589743,
+        "precisao_media": 0.9772727272727273
+      },
+      {
+        "max_depth": 4,
+        "f2_medio": 0.8034293292913983,
+        "sensibilidade_media": 0.7724358974358974,
+        "precisao_media": 0.9807692307692308
+      },
+      {
+        "max_depth": 5,
+        "f2_medio": 0.9526209677419355,
+        "sensibilidade_media": 0.9807692307692308,
+        "precisao_media": 0.8660714285714286
+      },
+      {
+        "max_depth": 6,
+        "f2_medio": 1.0,
+        "sensibilidade_media": 1.0,
+        "precisao_media": 1.0
+      },
+      {
+        "max_depth": null,
+        "f2_medio": 1.0,
+        "sensibilidade_media": 1.0,
+        "precisao_media": 1.0
+      }
+    ]
+  },
+  "arvore": {
+    "sensibilidade_prioritaria": 1.0,
+    "precisao_prioritaria": 1.0,
+    "acuracia": 1.0,
+    "matriz_confusao": [
+      [
+        10,
+        0
+      ],
+      [
+        0,
+        14
+      ]
+    ],
+    "ordem_classes_matriz": [
+      0,
+      1
+    ],
+    "linhas": "real",
+    "colunas": "prevista"
+  },
+  "baseline_maioria": {
+    "sensibilidade_prioritaria": 1.0,
+    "precisao_prioritaria": 0.5833333333333334,
+    "acuracia": 0.5833333333333334,
+    "matriz_confusao": [
+      [
+        0,
+        10
+      ],
+      [
+        0,
+        14
+      ]
+    ],
+    "ordem_classes_matriz": [
+      0,
+      1
+    ],
+    "linhas": "real",
+    "colunas": "prevista"
+  },
+  "classe_majoritaria_treino": 1,
+  "falsos_negativos": [],
+  "versoes": {
+    "python": "3.12.14",
+    "pandas": "2.2.3",
+    "numpy": "2.3.5",
+    "scikit_learn": "1.8.0",
+    "joblib": "1.5.3"
+  },
+  "limites": [
+    "Teste pequeno e fictício: métricas não estimam desempenho em instituições reais.",
+    "Rótulos derivados de uma política explícita: o modelo aproxima regras escolhidas, sem descoberta de risco real.",
+    "Famílias separadas reduzem vazamento de variações; padrões de atributos podem se repetir entre famílias.",
+    "Ausência de falsos negativos neste teste, se observada, não garante segurança fora da amostra.",
+    "Nenhuma previsão substitui inspeção técnica, resposta a emergências ou decisão do responsável."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "data_verificacao": "2026-11-15",
+  "local": "Codex Cloud, Linux, Python 3.12.14",
+  "dados": "Somente dados fictícios do projeto",
+  "colab": {
+    "pagina_inicial_http": 200,
+    "importacao_executada": false,
+    "celulas_executadas_no_google": false,
+    "limitacao": "A ferramenta de controle da sessão de navegador/desktop não foi disponibilizada nesta conversa; a resposta HTTP 200 da página inicial não verifica login, importação nem execução.",
+    "alternativa": "Notebook autocontido executado localmente com nbclient; saídas salvas no arquivo entregue."
+  },
+  "ia_generativa": {
+    "provedor": "OpenAI, integração opcional no Flask",
+    "chamada_real_validada": false,
+    "testes": "Respostas simuladas, dados fictícios, falhas e campos desconhecidos; nenhuma credencial incluída no repositório.",
+    "configuracao": "OPENAI_API_KEY e OPENAI_MODEL em variáveis de ambiente do servidor ou .env local ignorado pelo Git."
+  }
+}

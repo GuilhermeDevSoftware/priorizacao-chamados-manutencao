@@ -1,0 +1,22 @@
+|--- servico_essencial_interrompido <= 0.50
+|   |--- risco_seguranca <= 0.50
+|   |   |--- pessoas_afetadas <= 39.50
+|   |   |   |--- dias_aguardando <= 13.50
+|   |   |   |   |--- class: 0
+|   |   |   |--- dias_aguardando >  13.50
+|   |   |   |   |--- recorrente <= 0.50
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- recorrente >  0.50
+|   |   |   |   |   |--- pessoas_afetadas <= 9.50
+|   |   |   |   |   |   |--- class: 0
+|   |   |   |   |   |--- pessoas_afetadas >  9.50
+|   |   |   |   |   |   |--- class: 1
+|   |   |--- pessoas_afetadas >  39.50
+|   |   |   |--- dias_aguardando <= 6.50
+|   |   |   |   |--- class: 0
+|   |   |   |--- dias_aguardando >  6.50
+|   |   |   |   |--- class: 1
+|   |--- risco_seguranca >  0.50
+|   |   |--- class: 1
+|--- servico_essencial_interrompido >  0.50
+|   |--- class: 1

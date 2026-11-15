@@ -1,0 +1,10 @@
+{
+  "name": "priorizacao-chamados-manutencao",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Protótipo acadêmico com chamados de manutenção fictícios — Guilherme Costa",
+  "scripts": {
+    "test:paridade": "python -m pytest tests/test_paridade.py -q"
+  }
+}
