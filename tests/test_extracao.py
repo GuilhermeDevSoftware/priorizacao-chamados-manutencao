@@ -9,9 +9,10 @@ from app import FEATURES, create_app
 
 
 @pytest.fixture
-def client():
+def client(tmp_path):
     # Chave fictícia; todas as saídas de rede deste módulo são interceptadas.
-    return create_app({"TESTING": True, "OPENAI_API_KEY": "chave-ficticia-de-teste"}).test_client()
+    return create_app({"TESTING": True, "OPENAI_API_KEY": "chave-ficticia-de-teste",
+        "DATABASE_PATH": str(tmp_path / "chamados.sqlite3"), "UPLOAD_FOLDER": str(tmp_path / "uploads")}).test_client()
 
 
 def resposta_mock(campos):

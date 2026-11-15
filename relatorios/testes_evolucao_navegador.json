@@ -1,0 +1,62 @@
+{
+  "executado_em_utc": "2026-11-15T22:31:20.542292+00:00",
+  "ambiente": "Codex Cloud Linux, Chromium real headless via Playwright",
+  "navegador": "156.0.8078.79",
+  "dados": "Somente exemplos fictícios; imagem sintética de teste; SQLite e uploads temporários",
+  "flask": {
+    "status": "aprovado",
+    "viewport": "390x844",
+    "cadastros": [
+      {
+        "cenario": "Fiação exposta em corredor de pouca circulação — imagem sintética de teste.",
+        "equipe": "Elétrica",
+        "prioridade": 1,
+        "foto": true
+      },
+      {
+        "cenario": "Vazamento na torneira auxiliar — cenário fictício sem foto.",
+        "equipe": "Hidráulica",
+        "prioridade": 0,
+        "foto": false
+      },
+      {
+        "cenario": "Computador com defeito — cenário fictício de TI.",
+        "equipe": "TI",
+        "prioridade": 0,
+        "foto": false
+      },
+      {
+        "cenario": "Internet sem conexão e tomada danificada — caso fictício de duas áreas.",
+        "equipe": "Triagem geral",
+        "prioridade": 1,
+        "foto": false
+      }
+    ],
+    "previa_remocao_foto": "aprovado",
+    "arquivo_invalido": "rejeitado no formulário",
+    "confirmacao_obrigatoria": true,
+    "ia_sem_chave": "regra local identificada; foto não analisada por IA",
+    "correcao_manual_equipe": "Elétrica sugerida preservada; responsável alterado para Triagem geral",
+    "status_chamado": "Em atendimento preservado após reinício",
+    "filtros_combinados": "um registro esperado",
+    "persistencia": "processo Flask encerrado e outro iniciado com mesmo SQLite/uploads; quatro registros e foto íntegra",
+    "captura_camera": "atributo capture=environment verificado; câmera física não exercitada",
+    "rolagem_horizontal": false,
+    "erros_console_e_pagina": [],
+    "captura": "relatorios/evolucao_flask_celular.png"
+  },
+  "pages_local": {
+    "status": "aprovado",
+    "url": "http://127.0.0.1:43519/priorizacao-chamados-manutencao/",
+    "viewport": "390x844",
+    "exemplos_fixos": 4,
+    "filtros_combinados": "Hidráulica/Normal/Em atendimento = um exemplo",
+    "alteracoes": "desabilitadas com explicação Flask",
+    "previsao_arvore": "fiação exposta = Prioritário",
+    "envios_de_dados": [],
+    "rolagem_horizontal": false,
+    "erros_console_e_pagina": [],
+    "captura": "relatorios/evolucao_pages_local.png"
+  },
+  "resultado": "aprovado"
+}

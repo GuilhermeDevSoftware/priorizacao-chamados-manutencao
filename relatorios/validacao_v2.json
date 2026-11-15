@@ -1,0 +1,15 @@
+{
+  "suite": "python -m pytest -q",
+  "resultado_observado": "110 passed, 1 warning in 3.84s",
+  "testes_aprovados": 110,
+  "paridade": {
+    "casos": 2624,
+    "divergencias": 0
+  },
+  "navegador": "relatorios/testes_evolucao_navegador.json",
+  "interface_multimodal": "relatorios/teste_extracao_interface_v2.json",
+  "chamada_real_openai": false,
+  "camera_fisica_exercitada": false,
+  "dados": "Fictícios; banco e uploads dos testes temporários",
+  "arvore": "Mesma árvore treinada; notebook e modelo preservados"
+}

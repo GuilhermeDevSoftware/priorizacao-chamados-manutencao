@@ -7,14 +7,22 @@ from __future__ import annotations
 
 import json
 import os
+import sqlite3
 import struct
+from contextlib import suppress
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 import requests
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge, UnsupportedMediaType
+
+import storage
+from imagens import FotoGrande, FotoInvalida, normalizar_foto
+from multimodal import alternativa_local, consultar_ia, validar_analise_salva
 
 ROOT = Path(__file__).resolve().parent
 FEATURES = [
@@ -147,10 +155,19 @@ def create_app(config: dict | None = None) -> Flask:
         MODEL_PATH=str(ROOT / "modelo" / "arvore.json"),
         OPENAI_API_KEY=os.getenv("OPENAI_API_KEY", ""),
         OPENAI_MODEL=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        MAX_CONTENT_LENGTH=32 * 1024,
+        DATABASE_PATH=str(ROOT / "instance" / "chamados.sqlite3"),
+        UPLOAD_FOLDER=str(ROOT / "instance" / "uploads"),
+        MAX_CONTENT_LENGTH=6 * 1024 * 1024,
     )
     if config:
         app.config.update(config)
+    storage.inicializar(app)
+
+    @app.before_request
+    def limites_por_rota():
+        # O anexo tem limite próprio de 5 MiB; rotas JSON continuam com 32 KiB.
+        if request.path in ("/api/prever", "/api/extrair") or request.method == "PATCH":
+            request.max_content_length = 32 * 1024
 
     @app.get("/")
     def inicio():
@@ -158,7 +175,7 @@ def create_app(config: dict | None = None) -> Flask:
 
     @app.get("/config.json")
     def configuracao():
-        return jsonify(modo="api", extracao_habilitada=bool(app.config["OPENAI_API_KEY"]))
+        return jsonify(modo="api", extracao_habilitada=bool(app.config["OPENAI_API_KEY"]), armazenamento_habilitado=True)
 
     @app.get("/modelo/arvore.json")
     def modelo_exportado():
@@ -202,17 +219,175 @@ def create_app(config: dict | None = None) -> Flask:
             confirmacao_necessaria=True,
         )
 
+    def ler_multipart(campos_permitidos):
+        if request.mimetype != "multipart/form-data":
+            raise UnsupportedMediaType()
+        if set(request.form) - set(campos_permitidos) or set(request.files) - {"foto"}:
+            raise ValueError("Há campos não reconhecidos no formulário.")
+        if any(len(request.form.getlist(k)) != 1 for k in request.form) or len(request.files.getlist("foto")) > 1:
+            raise ValueError("Envie uma única ocorrência de cada campo e no máximo uma foto.")
+        return request.form
+
+    @app.post("/api/analisar")
+    def analisar():
+        try:
+            formulario = ler_multipart({"descricao"})
+            descricao = formulario.get("descricao")
+            if not isinstance(descricao, str) or not 1 <= len(descricao.strip()) <= 2000:
+                raise ValueError("Informe uma descrição de 1 a 2.000 caracteres.")
+            foto = normalizar_foto(request.files.get("foto"))
+        except FotoGrande as erro:
+            return jsonify(erro=str(erro)), 413
+        except (FotoInvalida, ValueError) as erro:
+            return jsonify(erro=str(erro)), 400
+        chave = app.config["OPENAI_API_KEY"]
+        if not chave:
+            return jsonify(alternativa_local(descricao, com_foto=foto is not None))
+        try:
+            analise = consultar_ia(descricao.strip(), foto, chave, app.config["OPENAI_MODEL"])
+        except (requests.RequestException, ValueError, TypeError, KeyError, IndexError):
+            analise = alternativa_local(descricao, com_foto=foto is not None, motivo="Serviço de IA indisponível ou com resposta inválida")
+        return jsonify(analise)
+
+    @app.post("/api/chamados")
+    def cadastrar_chamado():
+        try:
+            formulario = ler_multipart({"dados"})
+            bruto = formulario.get("dados", "")
+            if len(bruto.encode("utf-8")) > 32 * 1024:
+                raise RequestEntityTooLarge()
+            try:
+                dados = json.loads(bruto)
+            except (ValueError, TypeError):
+                raise ValueError("O campo dados deve conter um objeto JSON válido.")
+            permitidos = set(FEATURES) | {"descricao", "local", "equipe_confirmada", "confirmado", "analise"}
+            if not isinstance(dados, dict) or set(dados) - permitidos:
+                raise ValueError("Envie somente os dados de cadastro reconhecidos.")
+            campos, erros = validar_campos({k: dados[k] for k in FEATURES + ["descricao"] if k in dados})
+            if not isinstance(dados.get("descricao"), str) or not 1 <= len(dados["descricao"].strip()) <= 2000:
+                erros["descricao"] = "Informe uma descrição de 1 a 2.000 caracteres."
+            local = dados.get("local")
+            if not isinstance(local, str) or not 1 <= len(local.strip()) <= 200:
+                erros["local"] = "Informe um local de 1 a 200 caracteres."
+            if dados.get("equipe_confirmada") not in storage.EQUIPES:
+                erros["equipe_confirmada"] = "Selecione TI, Elétrica, Hidráulica ou Triagem geral."
+            if dados.get("confirmado") is not True:
+                erros["confirmado"] = "Confirme os campos e a equipe antes de salvar."
+            if erros:
+                return jsonify(erro="Revise os dados do cadastro.", detalhes=erros), 400
+            foto = normalizar_foto(request.files.get("foto"))
+            analise = dados.get("analise")
+            if analise is None:
+                analise = alternativa_local(dados["descricao"], com_foto=foto is not None, motivo="Cadastro manual")
+            else:
+                analise = validar_analise_salva(analise)
+        except FotoGrande as erro:
+            return jsonify(erro=str(erro)), 413
+        except (FotoInvalida, ValueError) as erro:
+            return jsonify(erro=str(erro)), 400
+        try:
+            classe = prever_arvore(carregar_arvore(app.config["MODEL_PATH"]), campos)
+        except (OSError, ValueError, TypeError, KeyError, IndexError):
+            return jsonify(erro="O modelo está indisponível. Verifique o arquivo exportado."), 503
+        caminho_foto = None
+        caminho_real = None
+        conexao = storage.conectar()
+        try:
+            if foto is not None:
+                nome = uuid4().hex + ".jpg"
+                caminho_foto = "uploads/" + nome
+                caminho_real = Path(app.config["UPLOAD_FOLDER"]) / nome
+                caminho_real.write_bytes(foto)
+            colunas = ["descricao", "local", "data_abertura", *FEATURES, "prioridade_sugerida", "equipe_sugerida", "justificativa_equipe", "equipe_confirmada", "status", "foto_caminho", "analise_json"]
+            valores = [dados["descricao"].strip(), local.strip(), datetime.now(timezone.utc).isoformat(),
+                       *[campos[k] for k in FEATURES], classe, analise["equipe_sugerida"], analise["justificativa_equipe"],
+                       dados["equipe_confirmada"], "Aberto", caminho_foto, json.dumps(analise, ensure_ascii=False)]
+            # Os nomes de colunas são constantes do código; somente valores entram por parâmetros.
+            cursor = conexao.execute(f"INSERT INTO chamados ({','.join(colunas)}) VALUES ({','.join('?' for _ in colunas)})", valores)
+            registro = storage.serializar(conexao.execute("SELECT * FROM chamados WHERE id = ?", (cursor.lastrowid,)).fetchone())
+            conexao.commit()
+        except (sqlite3.Error, OSError):
+            with suppress(sqlite3.Error):
+                conexao.rollback()
+            if caminho_real is not None:
+                with suppress(OSError):
+                    caminho_real.unlink(missing_ok=True)
+            return jsonify(erro="Não foi possível salvar o chamado. Verifique o armazenamento local e tente novamente."), 503
+        resposta = jsonify(registro)
+        resposta.status_code = 201
+        resposta.headers["Location"] = f"/api/chamados/{registro['id']}"
+        return resposta
+
+    @app.get("/api/chamados")
+    def listar_chamados():
+        permitidos = {"equipe", "prioridade", "status"}
+        if set(request.args) - permitidos or any(len(request.args.getlist(k)) != 1 for k in request.args):
+            return jsonify(erro="Use somente os filtros equipe, prioridade e status, uma vez cada."), 400
+        filtros = []
+        valores = []
+        definicoes = {"equipe": ("equipe_confirmada", storage.EQUIPES), "prioridade": ("prioridade_sugerida", ("0", "1")), "status": ("status", storage.STATUS)}
+        for nome, (coluna, opcoes) in definicoes.items():
+            if nome in request.args:
+                valor = request.args[nome]
+                if valor not in opcoes:
+                    return jsonify(erro=f"Filtro {nome} inválido."), 400
+                filtros.append(coluna + " = ?")
+                valores.append(int(valor) if nome == "prioridade" else valor)
+        sql = "SELECT * FROM chamados" + (" WHERE " + " AND ".join(filtros) if filtros else "") + " ORDER BY data_abertura DESC, id DESC"
+        registros = [storage.serializar(r) for r in storage.conectar().execute(sql, valores).fetchall()]
+        return jsonify(chamados=registros, total=len(registros))
+
+    @app.route("/api/chamados/<int:chamado_id>", methods=["GET", "PATCH"])
+    def consultar_atualizar_chamado(chamado_id):
+        conexao = storage.conectar()
+        linha = conexao.execute("SELECT * FROM chamados WHERE id = ?", (chamado_id,)).fetchone()
+        if linha is None:
+            return jsonify(erro="Chamado não encontrado."), 404
+        if request.method == "PATCH":
+            dados = ler_json()
+            if not isinstance(dados, dict) or not dados or set(dados) - {"equipe_confirmada", "status"}:
+                return jsonify(erro="Envie equipe_confirmada e/ou status para atualizar o chamado."), 400
+            if "equipe_confirmada" in dados and dados["equipe_confirmada"] not in storage.EQUIPES:
+                return jsonify(erro="Equipe inválida."), 400
+            if "status" in dados and dados["status"] not in storage.STATUS:
+                return jsonify(erro="Status inválido."), 400
+            atribuicoes = [nome + " = ?" for nome in dados]
+            conexao.execute("UPDATE chamados SET " + ", ".join(atribuicoes) + " WHERE id = ?", [*dados.values(), chamado_id])
+            linha = conexao.execute("SELECT * FROM chamados WHERE id = ?", (chamado_id,)).fetchone()
+            conexao.commit()
+        return jsonify(storage.serializar(linha))
+
+    @app.get("/api/chamados/<int:chamado_id>/foto")
+    def foto_chamado(chamado_id):
+        linha = storage.conectar().execute("SELECT foto_caminho FROM chamados WHERE id = ?", (chamado_id,)).fetchone()
+        if linha is None or not linha["foto_caminho"]:
+            return jsonify(erro="Foto não encontrada."), 404
+        # O nome é gerado pelo servidor; o caminho vindo do banco também é limitado.
+        caminho = linha["foto_caminho"]
+        nome = Path(caminho).name
+        if caminho != "uploads/" + nome or not nome.endswith(".jpg"):
+            return jsonify(erro="Foto não encontrada."), 404
+        real = Path(app.config["UPLOAD_FOLDER"]) / nome
+        if not real.is_file():
+            return jsonify(erro="Foto não encontrada."), 404
+        return send_from_directory(app.config["UPLOAD_FOLDER"], nome, mimetype="image/jpeg")
+
     @app.errorhandler(BadRequest)
     def json_invalido(_erro):
         return jsonify(erro="O corpo da requisição contém JSON inválido."), 400
 
     @app.errorhandler(UnsupportedMediaType)
     def tipo_invalido(_erro):
-        return jsonify(erro="Envie Content-Type: application/json."), 415
+        mensagem = "Envie multipart/form-data com os campos e a foto opcional." if request.path in ("/api/analisar", "/api/chamados") and request.method == "POST" else "Envie Content-Type: application/json."
+        return jsonify(erro=mensagem), 415
 
     @app.errorhandler(RequestEntityTooLarge)
     def corpo_grande(_erro):
-        return jsonify(erro="A requisição excede o limite de 32 KB."), 413
+        return jsonify(erro="A requisição excede o limite permitido: JSON até 32 KiB e formulário com foto até 6 MiB."), 413
+
+    @app.errorhandler(sqlite3.Error)
+    def erro_banco(_erro):
+        return jsonify(erro="O armazenamento local está indisponível. Tente novamente."), 503
 
     @app.after_request
     def cabecalhos(resposta):

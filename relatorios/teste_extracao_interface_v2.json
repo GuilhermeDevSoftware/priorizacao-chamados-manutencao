@@ -1,0 +1,38 @@
+{
+  "script": "scripts/testar_extracao_interface.py",
+  "executado_em": "2026-11-15T22:30:31.796080+00:00",
+  "ambiente": "Chromium headless local, viewport móvel 390 x 844",
+  "integracao_externa": "Simulada com interceptação Playwright; nenhuma chamada real à OpenAI.",
+  "chamadas_previsao_simuladas": 2,
+  "verificacoes": [
+    {
+      "cenario": "Sugestões simuladas com informações ausentes",
+      "resultado": "Campos ausentes continuam vazios; campos conhecidos preenchidos; nenhuma previsão automática."
+    },
+    {
+      "cenario": "Analisar com sugestões desconhecidas",
+      "resultado": "Validação bloqueou a previsão antes de chamar a API."
+    },
+    {
+      "cenario": "Campos completos sem confirmação humana",
+      "resultado": "Previsão bloqueada; solicitada confirmação explícita."
+    },
+    {
+      "cenario": "Editar campo após confirmar sugestões",
+      "resultado": "Confirmação foi desmarcada automaticamente."
+    },
+    {
+      "cenario": "Campos completos e confirmados",
+      "resultado": "Uma chamada à API de previsão com campos revisados; resultado prioritário exibido."
+    },
+    {
+      "cenario": "Serviço externo indisponível simulado",
+      "resultado": "Mensagem de falha exibida e entrada manual continuou funcionando com previsão pela API."
+    },
+    {
+      "cenario": "Fallback textual sem IA com campos manuais",
+      "resultado": "A equipe TI foi sugerida; campos manuais válidos foram preservados, sem converter desconhecidos em zero nem prever automaticamente."
+    }
+  ],
+  "resultado": "7 verificações aprovadas"
+}

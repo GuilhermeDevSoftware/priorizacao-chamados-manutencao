@@ -11,3 +11,7 @@ __pycache__/
 *.log
 node_modules/
 resultados_notebook.zip
+instance/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal

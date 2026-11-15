@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def preparar():
     destino = ROOT / "docs"
     destino.mkdir(exist_ok=True)
-    for nome in ("index.html", "styles.css", "app.js", "engine.js", "config.json"):
+    for nome in ("index.html", "styles.css", "app.js", "engine.js", "config.json", "chamados_demo.json"):
         origem = ROOT / "frontend" / nome
         if not origem.is_file():
             raise FileNotFoundError(f"Arquivo obrigatório ausente: {origem}")

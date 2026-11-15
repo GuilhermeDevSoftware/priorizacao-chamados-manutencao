@@ -36,8 +36,11 @@ def servidores_locais():
     subprocess.run([sys.executable, str(ROOT / "scripts/preparar_pages.py")], cwd=ROOT, check=True)
     ambiente = dict(os.environ)
     ambiente["OPENAI_API_KEY"] = ""
+    dados_temporarios = tempfile.TemporaryDirectory(prefix="chamados-browser-db-")
+    ambiente["CHAMADOS_TEST_DATABASE"] = str(Path(dados_temporarios.name) / "testes.sqlite3")
+    ambiente["CHAMADOS_TEST_UPLOADS"] = str(Path(dados_temporarios.name) / "uploads")
     flask = subprocess.Popen(
-        [sys.executable, "-c", "from app import create_app; create_app({'OPENAI_API_KEY': ''}).run(host='127.0.0.1', port=5055, use_reloader=False)"],
+        [sys.executable, "-c", "import os; from app import create_app; create_app({'OPENAI_API_KEY': '', 'DATABASE_PATH': os.environ['CHAMADOS_TEST_DATABASE'], 'UPLOAD_FOLDER': os.environ['CHAMADOS_TEST_UPLOADS']}).run(host='127.0.0.1', port=5055, use_reloader=False)"],
         cwd=ROOT, env=ambiente, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
     servidor = None
@@ -73,6 +76,7 @@ def servidores_locais():
         except subprocess.TimeoutExpired:
             flask.kill()
             flask.wait()
+        dados_temporarios.cleanup()
 
 
 def preencher(page, valores):
@@ -105,7 +109,7 @@ def testar_modo(browser, nome, url, modo_esperado):
         assert config["modo"] == modo_esperado, config
         assert config["extracao_habilitada"] is False
         assert page.locator("html").get_attribute("lang") == "pt-BR"
-        assert page.locator("#extrair").is_disabled()
+        assert page.locator("#extrair").is_disabled() == (modo_esperado == "demonstracao")
         # Exemplos precisam preencher os cinco campos, mantendo a descrição fictícia.
         exemplos_testados = []
         for exemplo in ("macaneta", "agua", "fiacao"):
@@ -162,7 +166,7 @@ def testar_modo(browser, nome, url, modo_esperado):
         else:
             page.get_by_role("button", name="Analisar chamado", exact=True).click()
         page.wait_for_function("document.querySelector('#resultado').textContent.includes('Prioritário')")
-        captura = RELATORIOS / f"celular_{nome}.png"
+        captura = RELATORIOS / f"celular_{nome}_v2.png"
         # Volta ao topo: evita que elementos fixed fora da tela apareçam no full-page.
         page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
         page.screenshot(path=str(captura), full_page=True)
@@ -174,7 +178,7 @@ def testar_modo(browser, nome, url, modo_esperado):
         assert not erros_console, erros_console
         assert not erros_pagina, erros_pagina
         return {"modo": nome, "url": url, "viewport": "390x844", "configuracao": config,
-                "cenarios": resultados, "exemplos_preenchiveis": exemplos_testados, "extracao_sem_credencial": "botão desabilitado", "teclado": "foco útil após Tab", "rolagem_horizontal": False,
+                "cenarios": resultados, "exemplos_preenchiveis": exemplos_testados, "extracao_sem_credencial": "sugestão local disponível" if modo_esperado == "api" else "botão desabilitado", "teclado": "foco útil após Tab", "rolagem_horizontal": False,
                 "chamadas_post_api_prever": len(requisicoes_api), "respostas_api_prever": respostas_api, "erros_console": erros_console, "erros_pagina": erros_pagina,
                 "captura": str(captura.relative_to(ROOT)), "status": "aprovado"}
     finally:
@@ -193,7 +197,7 @@ def main():
         try:
             if args.url:
                 testes = [testar_modo(browser, "pages_publico", args.url, "demonstracao")]
-                destino = RELATORIOS / "teste_pages_publico.json"
+                destino = RELATORIOS / "teste_pages_publico_v2.json"
                 paridade = None
             else:
                 with servidores_locais() as modos:
@@ -201,7 +205,7 @@ def main():
                 sys.path.insert(0, str(ROOT / "tests"))
                 from test_paridade import medir_paridade
                 paridade = medir_paridade()
-                destino = RELATORIOS / "testes_automatizados.json"
+                destino = RELATORIOS / "testes_automatizados_v2.json"
             relatorio = {"executado_em_utc": datetime.now(timezone.utc).isoformat(),
                          "ambiente": "Codex Cloud Linux; Chromium real via Playwright, modo headless",
                          "dados": "Somente chamados fictícios", "navegador": browser.version,

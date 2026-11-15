@@ -19,7 +19,8 @@ def client(tmp_path):
     }
     caminho = tmp_path / "arvore.json"
     caminho.write_text(json.dumps(arvore), encoding="utf-8")
-    return create_app({"TESTING": True, "MODEL_PATH": str(caminho), "OPENAI_API_KEY": ""}).test_client()
+    return create_app({"TESTING": True, "MODEL_PATH": str(caminho), "OPENAI_API_KEY": "",
+        "DATABASE_PATH": str(tmp_path / "chamados.sqlite3"), "UPLOAD_FOLDER": str(tmp_path / "uploads")}).test_client()
 
 
 @pytest.fixture
@@ -88,7 +89,7 @@ def test_content_type_e_json_malformado(client):
 
 
 def test_configuracao_e_artefato(client):
-    assert client.get("/config.json").json == {"modo": "api", "extracao_habilitada": False}
+    assert client.get("/config.json").json == {"modo": "api", "extracao_habilitada": False, "armazenamento_habilitado": True}
     assert client.get("/modelo/arvore.json").json["feature_order"] == FEATURES
 
 

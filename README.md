@@ -1,14 +1,14 @@
 # Sistema Inteligente para Priorização de Chamados de Manutenção
 
-Projeto acadêmico de Engenharia de Computação. **Integrante único: Guilherme Costa.** Entrega prevista: **20/11/2026**.
+Projeto acadêmico de Engenharia de Computação. **Integrante único: Guilherme Costa.** Prazo informado: **20/11/2026**. Evolução v2: fotos, equipes e armazenamento local.
 
-Protótipo para escolas, ONGs e pequenas instituições: informa cinco características de um chamado e sugere **0 = normal** ou **1 = prioritário**. O responsável revisa a sugestão e decide a ordem do atendimento. A classificação é feita por uma árvore de decisão treinada com scikit-learn.
+Protótipo para escolas, ONGs e pequenas instituições. A árvore de decisão treinada com scikit-learn sugere **0 = normal** ou **1 = prioritário**. A versão local também cadastra chamados com foto opcional, sugere uma equipe e mantém o histórico em SQLite. O responsável confirma os dados, escolhe a equipe e decide a ordem do atendimento.
 
 **Todos os 120 chamados são fictícios.** O sistema não foi validado em uma instituição real, e os resultados apresentados não comprovam segurança ou eficácia em uso operacional. Em situações de risco, a instituição deve aplicar seus procedimentos de emergência e avaliação técnica.
 
 ## Executar no computador
 
-Ambiente medido: Python 3.12, pandas 2.2.3, scikit-learn 1.8.0 e Flask 3.1.2. Os comandos abaixo usam um terminal Linux/macOS na raiz do projeto.
+Use Python 3.12 e Node.js 18 ou superior para os testes de paridade. Os comandos abaixo são executados na raiz do projeto:
 
 ```bash
 python -m venv .venv
@@ -17,20 +17,51 @@ python -m pip install -r requirements-dev.txt
 python app.py
 ```
 
-Abra **http://127.0.0.1:5000**. Para outra porta: `PORT=5055 python app.py`. O Flask serve a interface e a API; o JavaScript chama `POST /api/prever` para cada previsão. Para apenas executar o aplicativo e retreinar, `requirements.txt` basta; `requirements-dev.txt` inclui as ferramentas de teste e execução de notebooks.
+No Windows, ative com `.venv\Scripts\activate`. Abra **http://127.0.0.1:5000**. Para outra porta em Linux/macOS, use `PORT=5055 python app.py`. O Flask serve a interface e a API local. O SQLite usa o módulo `sqlite3` da biblioteca padrão; não exige instalar ou manter um servidor de banco. A validação de imagens usa Pillow.
 
-## Usar o protótipo
+Para apenas executar o aplicativo e retreinar, instale `requirements.txt`. As dependências de desenvolvimento incluem testes e execução de notebooks. Nenhum serviço de hospedagem adicional ou login é necessário nesta versão local.
 
-1. Preencha a descrição opcional ou carregue um dos exemplos fictícios.
-2. Informe risco à segurança, serviço essencial interrompido, pessoas afetadas, dias aguardando e recorrência.
-3. Selecione **Analisar chamado** e leia a classe e o resumo.
-4. O responsável deve confirmar os dados e definir a ordem do atendimento.
+## Usar o protótipo local
 
-Campos binários aceitam somente `0` ou `1`. Pessoas e dias são inteiros não negativos; campos em branco são desconhecidos e impedem a previsão. A descrição é documental e não entra diretamente no classificador.
+1. Escreva a descrição e informe o local do defeito. Para salvar, ambos são obrigatórios.
+2. Opcionalmente, escolha uma foto da galeria ou tire uma foto em um celular compatível. Confira a prévia e remova o arquivo se necessário.
+3. Solicite sugestões de campos e equipe ou preencha os campos manualmente. A análise com IA usa a descrição e a foto quando a integração estiver configurada.
+4. Complete as informações desconhecidas e revise os cinco campos da árvore. Confirme ou altere a equipe sugerida.
+5. **Analisar chamado** mostra a prioridade sem gravar um cadastro. **Salvar chamado** grava o registro e a foto no computador, após confirmação explícita.
+6. No painel, filtre por equipe responsável, prioridade e status. Abra um chamado para consultar seus dados e foto e atualizar equipe ou status.
+
+Os campos binários aceitam `0` ou `1`; pessoas e dias são inteiros não negativos. Campos em branco são desconhecidos e impedem a previsão e o cadastro. A prioridade é calculada novamente pelo servidor ao salvar. Alterar a equipe ou o status não recalcula a prioridade nem apaga a sugestão original.
+
+Descrição e foto ajudam a sugerir informações; não entram diretamente na árvore. Alterar os dados invalida a confirmação anterior. A árvore continua usando exclusivamente os cinco campos numéricos confirmados.
+
+## Equipes e status
+
+| Equipe | Exemplos |
+| --- | --- |
+| TI | Computador com defeito, impressora sem conexão, internet indisponível |
+| Elétrica | Fiação exposta, tomada danificada, falha de iluminação |
+| Hidráulica | Vazamento, torneira quebrada, falta de água |
+| Triagem geral | Área não identificada, descrição ambígua ou várias áreas envolvidas |
+
+A interface separa **equipe sugerida**, justificativa e **equipe confirmada**. O responsável pode corrigir a sugestão; o painel filtra a equipe confirmada, que representa o encaminhamento atual. A equipe não determina a prioridade.
+
+O status inicial é **Aberto** e pode ser alterado para **Em atendimento** ou **Resolvido**. Equipe, prioridade e status são apresentados separadamente.
+
+## SQLite, fotos e persistência
+
+O banco é criado automaticamente em `instance/chamados.sqlite3`; as fotos ficam em `instance/uploads/`. Não há gravação de imagens dentro do SQLite: o banco guarda apenas o caminho relativo. A aplicação usa consultas parametrizadas e nomes de arquivos gerados pelo servidor.
+
+Cada registro contém ID, descrição, local, data de abertura em UTC, os cinco campos da árvore, prioridade sugerida, equipe sugerida, justificativa, equipe confirmada e status. A análise estruturada, quando houver, é preservada para consulta. A data de abertura e a prioridade são definidas pelo servidor. O SQLite inicia vazio; os exemplos fixos do Pages não são importados automaticamente. Dias aguardando e prioridade ficam como valores confirmados no cadastro, sem reajuste automático pelo relógio.
+
+A foto é opcional. São aceitos **JPEG, PNG e WebP, até 5 MiB e 25 megapixels**. Se o celular exportar HEIC/HEIF, converta a foto para JPEG antes de anexar. O servidor verifica a decodificação real da imagem, corrige orientação, remove metadados e normaliza para JPEG com lado máximo de 2.048 pixels. A prévia não representa salvamento. Solicitar a análise também não grava o chamado: a foto só vai para a pasta de uploads no cadastro válido.
+
+Os dados continuam disponíveis ao fechar e iniciar novamente o Flask. Para backup, pare o aplicativo e copie **toda a pasta `instance/`**, preservando banco e uploads juntos. Para restaurar, recoloque essa pasta no mesmo projeto antes de iniciar o Flask. A fábrica da aplicação permite configurar `DATABASE_PATH` e `UPLOAD_FOLDER` em testes ou outra execução local.
+
+`instance/`, bancos locais, uploads e `.env` ficam fora do Git e do pacote público. A demonstração do Pages não recebe registros do SQLite.
 
 ## Dados e política de rotulagem
 
-A base reproduzível reúne **120 registros em 30 famílias**, com quatro variações de cada cenário. Contém problemas de baixo impacto, alto impacto e fronteiras dos limiares. ID, descrição, família, origem e justificativa documentam os exemplos; somente os cinco campos numéricos são entradas do modelo.
+A base CSV de treinamento é separada do SQLite usado nos novos cadastros: salvar chamados não retreina a IA automaticamente. A base reproduzível reúne **120 registros em 30 famílias**, com quatro variações de cada cenário. Contém problemas de baixo impacto, alto impacto e fronteiras dos limiares. ID, descrição, família, origem e justificativa documentam os exemplos; somente os cinco campos numéricos são entradas do modelo.
 
 | Campo de entrada | Significado |
 | --- | --- |
@@ -103,73 +134,96 @@ python -c "from pathlib import Path; import nbformat; from nbclient import Noteb
 
 Após qualquer retreinamento, prepare novamente os arquivos estáticos e repita os testes de paridade antes de publicar.
 
-## Árvore compartilhada e API
+## Árvore compartilhada e APIs
 
-`modelo/arvore.json` contém ordem dos atributos, classes, nós, índices de atributos, limiares, filhos, contagens e classe de cada nó, além de metadados de reprodução. O Flask e o navegador percorrem essa mesma árvore. O arquivo `modelo/arvore.joblib` permite comparar o estimador original do scikit-learn nos testes; o servidor não carrega objetos pickle fornecidos por visitantes.
+`modelo/arvore.json` contém ordem dos atributos, classes, nós, limiares, filhos, contagens e metadados. Flask e JavaScript percorrem essa mesma árvore com a conversão numérica usada pelo scikit-learn. `modelo/arvore.joblib` preserva o estimador para os testes de paridade. A evolução v2 não retreinou nem trocou o modelo.
 
-Exemplo de requisição:
+| Rota | Uso |
+| --- | --- |
+| `POST /api/prever` | JSON com os cinco campos e descrição opcional; devolve `classe`, `rotulo` e `campos`, sem cadastrar. |
+| `POST /api/analisar` | Multipart com `descricao` e `foto` opcional; sugere campos e equipe, sem cadastrar. |
+| `POST /api/chamados` | Multipart com `dados` em JSON e `foto` opcional; cadastra após confirmação e devolve o registro com HTTP 201. |
+| `GET /api/chamados` | Lista; filtros combináveis `equipe`, `prioridade` e `status`. |
+| `GET /api/chamados/<id>` | Consulta um registro. |
+| `PATCH /api/chamados/<id>` | JSON para alterar somente `equipe_confirmada` e/ou `status`. |
+| `GET /api/chamados/<id>/foto` | Consulta a imagem associada ao registro. |
+| `POST /api/extrair` | Compatibilidade com a extração textual v1; recebe somente `descricao` em JSON. |
+
+Exemplo de cadastro manual sem foto e sem chamada à IA:
 
 ```bash
-curl -X POST http://127.0.0.1:5000/api/prever \
-  -H 'Content-Type: application/json' \
-  -d '{"risco_seguranca":1,"servico_essencial_interrompido":0,"pessoas_afetadas":1,"dias_aguardando":0,"recorrente":0,"descricao":"Fiação exposta em local de pouca circulação — exemplo fictício"}'
+curl -X POST http://127.0.0.1:5000/api/chamados \
+  -F 'dados={"descricao":"Vazamento fictício em torneira auxiliar","local":"Pátio - exemplo fictício","risco_seguranca":0,"servico_essencial_interrompido":0,"pessoas_afetadas":5,"dias_aguardando":1,"recorrente":0,"equipe_confirmada":"Hidráulica","confirmado":true}'
 ```
 
-A resposta inclui `classe`, `rotulo` e `campos`. JSON incorreto ou entradas inválidas recebem 400; tipo de conteúdo incorreto recebe 415; modelo indisponível recebe 503. A API rejeita campos ausentes, tipos incorretos, valores negativos, decimais, binários diferentes de 0/1 e números fora da representação inteira segura comum ao JavaScript.
+Para anexar a imagem, acrescente `-F 'foto=@caminho/imagem.jpg'`. Ao usar o resultado de uma análise, `dados` também pode incluir `analise` com o objeto estruturado revisado. O servidor valida os dados e calcula a prioridade; o cliente não escolhe ID, data, caminho da foto, prioridade ou status inicial.
 
-## Extração opcional com IA generativa
+JSON incorreto e campos inválidos recebem 400, tipo de conteúdo incorreto recebe 415, limite de tamanho recebe 413 e registro inexistente recebe 404. As rotas legadas de JSON mantêm o limite de 32 KB. Fotos têm o limite próprio de 5 MiB, dentro do limite multipart de 6 MiB.
 
-A entrada manual funciona sem conta, contratação ou credencial externa. Para habilitar sugestões a partir da descrição na versão Flask:
+## IA multimodal opcional
+
+Para configurar a integração no Flask:
 
 ```bash
 cp .env.example .env
 ```
 
-Edite **somente o arquivo local `.env`**, preenchendo `OPENAI_API_KEY` com uma credencial criada no painel do provedor e, se necessário, `OPENAI_MODEL` (padrão `gpt-4o-mini`). Reinicie o Flask. A variável também pode ser configurada no gerenciador de segredos do servidor. `.env` está excluído do versionamento. A chave nunca deve entrar no HTML, no JavaScript, no notebook, em prints ou no repositório público.
+Edite **somente o `.env` local**, preenchendo `OPENAI_API_KEY` e, se necessário, `OPENAI_MODEL` (padrão `gpt-4o-mini`). Reinicie o Flask. A chave também pode ser definida como variável de ambiente do servidor. Ela não deve entrar no HTML, JavaScript, notebook, capturas, banco ou repositório.
 
-`POST /api/extrair` recebe apenas `{"descricao":"..."}` e consulta a API OpenAI para sugerir os cinco campos. Informações não declaradas retornam **`null` = desconhecido**, inclusive ausência de menção a risco. O formulário exige conferência e confirmação antes de classificar; a previsão final continua sendo da árvore. Sem chave, o endpoint responde 503; falha externa gera 502 e mantém a entrada manual disponível.
+Ao solicitar a análise configurada, o Flask envia a descrição e a imagem normalizada, se houver, à OpenAI. A resposta estruturada reúne tipo de defeito, indícios observados, áreas envolvidas, equipe sugerida, justificativa, campos sugeridos e informações a confirmar. O formulário informa esse envio antes da ação.
 
-**Validação da integração:** testes de servidor com respostas simuladas e seis verificações aprovadas da interface em Chromium móvel: campos desconhecidos permanecem vazios, nenhuma previsão automática, bloqueio de campos incompletos ou sem confirmação, edição invalida a confirmação, campos confirmados permitem previsão e falha externa mantém o preenchimento manual. Evidência: [relatorios/teste_extracao_interface.json](relatorios/teste_extracao_interface.json). **Nenhuma chamada real foi realizada**, pois não havia credencial de API configurada. O uso real pode exigir contratação e envia a descrição ao provedor; neste protótipo utilize somente conteúdo fictício.
+Informações ausentes permanecem **`null` = desconhecido**. Pessoas afetadas, dias e recorrência não são presumidos por uma foto. As sugestões precisam de revisão humana e a árvore calcula a prioridade a partir dos campos confirmados.
+
+Sem chave, em timeout ou diante de resposta externa inválida, `/api/analisar` devolve uma alternativa identificada como **regra local**, com aviso. Essa alternativa sugere a equipe pela descrição quando reconhece uma única área; ambiguidade ou várias áreas resultam em Triagem geral. Ela não afirma que analisou a imagem e não inventa valores para os cinco campos. O cadastro manual permanece disponível e **salvar não chama a API externa**.
+
+A rota textual legada `/api/extrair` mantém seu contrato: sem chave responde 503 e falha externa responde 502. O formulário evoluído usa `/api/analisar` e sua alternativa local.
+
+**Validação externa da v2:** não havia chave configurada e nenhuma chamada real à OpenAI foi realizada. A integração multimodal foi testada com respostas simuladas; o modo sem chave foi exercitado de ponta a ponta, com cadastro manual e sugestão textual local. A câmera física não foi exercitada: os testes móveis verificaram seleção, prévia, remoção e o atributo de captura do formulário.
 
 ## Testes
 
-Instale Node.js 18 ou superior para comparar a implementação JavaScript e use as dependências de desenvolvimento Python.
+Instale as dependências de desenvolvimento e Node.js 18 ou superior:
 
 ```bash
 python -m pytest -q
-python scripts/testar_navegador.py
+python scripts/testar_evolucao.py
 python scripts/testar_extracao_interface.py
 ```
 
-O teste de paridade compara o scikit-learn, o cliente de teste Flask e o módulo JavaScript da interface sobre a base, casos aleatórios e fronteiras. O teste de navegador usa Playwright e Chromium instalado, verifica os fluxos Flask e estático com prefixo de repositório em tela de celular. O teste de extração da interface usa respostas simuladas e não exige credencial. O Playwright está incluído em `requirements-dev.txt`. Se o computador não tiver um navegador compatível, instale-o com `python -m playwright install chromium`, de acordo com o ambiente local.
+O teste de navegador usa Playwright. Se necessário, instale um Chromium com `python -m playwright install chromium`; também é possível selecionar o navegador pelo `CHROMIUM_PATH`.
 
-Os testes de servidor medidos cobrem **45 casos aprovados**, incluindo resposta da API, validação e extração simulada. Os **dois testes de paridade e cenários obrigatórios** também passaram: foram comparados **2.624 casos, com zero divergências** entre scikit-learn, Flask e JavaScript. A navegação móvel também foi aprovada no Chromium 156 via Playwright em 390 × 844 pixels, nos modos Flask e estático sob o prefixo do repositório: maçaneta normal, falta de água prioritária, fiação exposta prioritária, formulário incompleto e inteiros inválidos. Os três exemplos preenchíveis, foco por teclado, ausência de rolagem horizontal e ausência de erros de console foram verificados. O modo Flask fez quatro previsões pela API; o estático fez zero chamadas à API. Evidências: [relatorios/testes_automatizados.json](relatorios/testes_automatizados.json), [captura Flask](relatorios/celular_flask.png) e [captura estática](relatorios/celular_pages_local.png).
+**Resultados medidos da v2:** 110 testes pytest aprovados, incluindo os 2.624 casos de paridade sem divergências. No Chromium 156 em 390 × 844, os quatro cenários foram cadastrados, equipe e status foram alterados, os filtros combinados retornaram o registro esperado e os quatro chamados e a foto permaneceram íntegros após encerrar o processo Flask e iniciar outro com o mesmo banco. Prévia/remoção e arquivo inválido também foram verificados, sem erros de console ou rolagem horizontal. O painel estático exibiu quatro exemplos fixos, com filtros e edição bloqueada. Evidência: [teste integrado](relatorios/testes_evolucao_navegador.json). As [sete verificações simuladas da interface multimodal](relatorios/teste_extracao_interface_v2.json) também passaram, incluindo informações desconhecidas, confirmação e preservação dos campos manuais no fallback.
 
-## Publicar no GitHub Pages
+As evidências históricas da v1 registram **47 testes aprovados** e **2.624 casos de paridade sem divergências**, além dos fluxos móveis em Chromium 156, 390 × 844. Elas documentam a primeira versão, que ainda não tinha SQLite nem fotos; não comprovam os recursos novos. Os artefatos históricos estão em `relatorios/testes_automatizados.json`, `relatorios/teste_pages_publico.json` e nas capturas correspondentes.
 
-A versão pública é estática: a interface informa **modo demonstração**, carrega a árvore JSON e prevê no navegador. Não existe servidor Flask nem credencial de API no GitHub Pages. Os caminhos relativos permitem hospedar em `/priorizacao-chamados-manutencao/`.
+## Flask local e GitHub Pages
 
-Se a pasta foi extraída do pacote ZIP e ainda não contém um repositório Git, inicialize-a e configure o repositório novo:
+| Recurso | Flask local | GitHub Pages |
+| --- | --- | --- |
+| Prever prioridade pela árvore | Sim, pela API | Sim, no navegador |
+| Selecionar foto e mostrar prévia | Sim | Sim, somente no navegador |
+| Analisar descrição e foto com IA | Opcional, com chave | Não |
+| Sugerir equipe pela análise/regra local | Sim | Apenas sugestões dos exemplos fictícios |
+| Salvar chamado e foto | Sim, SQLite e uploads locais | Não |
+| Painel e filtros | Registros do SQLite | Quatro exemplos fictícios fixos |
+| Atualizar equipe e status | Sim | Não, painel somente leitura |
 
-```bash
-git init -b main
-git remote add origin https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao.git
-```
+A página pública informa **modo demonstração** e identifica as funções que precisam do Flask. Nenhum cadastro local, banco ou upload é copiado para a publicação. Os caminhos relativos permitem o uso sob `/priorizacao-chamados-manutencao/`.
 
-Em uma cópia já clonada, preserve o remoto existente. Com a integração autorizada para o repositório, execute:
+Para atualizar a versão estática a partir do código:
 
 ```bash
 python scripts/preparar_pages.py
 git add .
-git commit -m "Publica protótipo acadêmico de priorização de chamados"
+git commit -m "Evolui chamados com fotos, equipes e SQLite local"
 git push origin main
 ```
 
-No GitHub, abra **Settings → Pages**, selecione a publicação a partir da branch `main`, pasta `/docs`, e salve. Depois da implantação, abra a URL retornada pelo GitHub e execute um dos exemplos fictícios. As instruções pressupõem um repositório novo, público e vazio; não é necessário alterar repositórios existentes.
+Antes de enviar, confira `git status` para garantir que a pasta `instance/` e o `.env` não estão incluídos. Em uma cópia clonada, preserve o remoto. No GitHub Pages, a fonte é branch `main`, pasta `/docs`. O preparo usa arquivos estáticos permitidos, nunca a pasta `instance/`.
 
-**Publicação verificada em 15/11/2026:** [repositório público](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao) e [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/). O envio para `main`, a referência remota e a implantação do Pages foram verificados. A URL pública foi aberta em Chromium móvel (390 × 844 pixels): maçaneta → normal, falta de água → prioritário e fiação exposta → prioritário; formulário incompleto, valores inválidos, teclado, ausência de rolagem horizontal e ausência de erros de console também foram aprovados. Evidências: [teste público](relatorios/teste_pages_publico.json) e [captura da demonstração pública](relatorios/celular_pages_publico.png). Os impedimentos de acesso ao GitHub foram resolvidos pelo titular. A execução do notebook foi validada localmente; o [link para abrir no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb) respondeu HTTP 200, mas não houve execução autenticada no Google Colab.
+Links do projeto: [repositório público](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao), [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/) e [notebook para abrir no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb). O notebook contém saídas da execução local, não da execução no serviço Google.
 
-A publicação está registrada em [relatorios/publicacao.json](relatorios/publicacao.json). Há também uma [prévia privada no Sites](https://prioriza-guilherme-costa-2026.evenmoat8.chatgpt.site), acessível somente ao proprietário; o link público para apresentação é o GitHub Pages.
+A [entrega v1](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/entrega-academica-2026-11-15) permanece como registro histórico. A evolução tem [pacote e evidências próprios na versão v2.0.0](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v2.0.0). A prévia privada no Sites é uma cópia independente da demonstração e não hospeda o Flask nem o SQLite.
 
 ## Coletar e validar dados reais
 
@@ -181,15 +235,20 @@ Dois responsáveis com conhecimento de manutenção devem rotular os casos indep
 
 ## Arquivos de entrega
 
-O pacote completo e os anexos separados estão na [versão de entrega para o Classroom](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/entrega-academica-2026-11-15).
+Baixe a [entrega v2.0.0](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v2.0.0), com ZIP e anexos. Os arquivos da v1 permanecem preservados:
 
-- `Projeto_Chamados_Manutencao.ipynb`: notebook com saídas.
-- `dados/`: CSV fictício e identificação da divisão por famílias.
-- `modelo/`: árvore JSON, estimador e regras legíveis.
-- `frontend/` e `app.py`: interface e servidor.
-- `docs/`: versão estática preparada para GitHub Pages.
-- `tests/`, `scripts/` e arquivos de dependências: reprodução e verificação.
-- `relatorios/`: métricas, previsões e evidências dos testes.
-- `docs_academicos/`: relatório acadêmico em Markdown e PDF, checklist do Classroom e roteiro de apresentação.
+- `Projeto_Chamados_Manutencao.ipynb`: notebook executado e autocontido.
+- `dados/` e `modelo/`: CSV fictício, divisão, árvore JSON e estimador.
+- Código Flask, módulos locais e `frontend/`: cadastro, análise, encaminhamento e painel.
+- `docs/`: demonstração estática com exemplos fixos.
+- `tests/`, `scripts/` e dependências: reprodução e verificação.
+- `relatorios/`: métricas originais e evidências identificadas por versão.
+- `docs_academicos/`: relatório, checklist do Classroom e roteiro de apresentação.
 
-Não há armazenamento de chamados enviados pela interface. A entrega no Google Classroom deve ser feita pelo titular com os arquivos deste projeto; publicação em GitHub ou entrega de um ZIP não representa envio ao Classroom.
+O pacote público exclui o banco, os uploads cadastrados, ambientes virtuais e credenciais. O envio ao Google Classroom deve ser feito pelo titular; disponibilizar o projeto no GitHub não representa envio à atividade.
+
+Para gerar novamente um ZIP somente com os arquivos do commit atual, excluindo dados locais e entregas anteriores:
+
+```bash
+python scripts/empacotar_entrega.py --saida ../Entrega_v2.zip
+```
