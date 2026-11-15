@@ -1,0 +1,16 @@
+Guilherme Costa - Sistema de chamados v2
+
+1. Extraia o ZIP e abra o terminal na pasta priorizacao-chamados-manutencao.
+2. Crie o ambiente: python -m venv .venv
+3. Ative: source .venv/bin/activate (Linux/macOS) ou .venv\Scripts\activate (Windows).
+4. Instale: python -m pip install -r requirements.txt
+5. Inicie: python app.py
+6. Abra http://127.0.0.1:5000
+
+Preencha descricao, local, campos da arvore e equipe. Marque a confirmacao e clique em Salvar chamado. Analisar chamado apenas calcula a prioridade.
+
+O banco instance/chamados.sqlite3 e a pasta instance/uploads sao criados automaticamente e permanecem no computador. Reinicie o Flask na mesma pasta para recuperar os chamados.
+
+A IA multimodal e opcional: configure OPENAI_API_KEY em .env local, usando .env.example como base. Nenhuma chamada real foi realizada nos testes; as respostas multimodais foram simuladas. O cadastro e a prioridade funcionam sem chave.
+
+Consulte README.md para detalhes e testes. O GitHub Pages tem exemplos fixos e nao salva chamados.
