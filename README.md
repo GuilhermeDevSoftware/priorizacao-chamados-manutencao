@@ -85,7 +85,7 @@ O resultado perfeito é compatível com uma amostra pequena cujos rótulos deriv
 
 ## Notebook e retreinamento
 
-[Projeto_Chamados_Manutencao.ipynb](Projeto_Chamados_Manutencao.ipynb) incorpora a geração da base e todo o processo de validação, divisão, ajuste, avaliação e exportação. Ele não depende de upload de um CSV externo e permanece compatível com o Google Colab. É possível abri-lo em `https://colab.research.google.com/`, escolher **Arquivo → Fazer upload de notebook** e depois **Ambiente de execução → Executar tudo**.
+[Projeto_Chamados_Manutencao.ipynb](Projeto_Chamados_Manutencao.ipynb) incorpora a geração da base e todo o processo de validação, divisão, ajuste, avaliação e exportação. [Abrir o notebook no Google Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb) permite carregar a versão do repositório; esse link não comprova execução no serviço Google. Ele não depende de upload de um CSV externo e permanece compatível com o Google Colab. É possível abri-lo em `https://colab.research.google.com/`, escolher **Arquivo → Fazer upload de notebook** e depois **Ambiente de execução → Executar tudo**.
 
 O notebook entregue é executado localmente com `nbclient` no ambiente Codex Cloud; não se deve interpretar esse teste como execução autenticada no Colab. A automação da sessão autenticada do navegador não estava disponível nesta tarefa.
 
@@ -138,15 +138,25 @@ Instale Node.js 18 ou superior para comparar a implementação JavaScript e use 
 ```bash
 python -m pytest -q
 python scripts/testar_navegador.py
+python scripts/testar_extracao_interface.py
 ```
 
-O teste de paridade compara o scikit-learn, o cliente de teste Flask e o módulo JavaScript da interface sobre a base, casos aleatórios e fronteiras. O teste de navegador usa Playwright e Chromium instalado, verifica os fluxos Flask e estático com prefixo de repositório em tela de celular. O Playwright está incluído em `requirements-dev.txt`. Se o computador não tiver um navegador compatível, instale-o com `python -m playwright install chromium`, de acordo com o ambiente local.
+O teste de paridade compara o scikit-learn, o cliente de teste Flask e o módulo JavaScript da interface sobre a base, casos aleatórios e fronteiras. O teste de navegador usa Playwright e Chromium instalado, verifica os fluxos Flask e estático com prefixo de repositório em tela de celular. O teste de extração da interface usa respostas simuladas e não exige credencial. O Playwright está incluído em `requirements-dev.txt`. Se o computador não tiver um navegador compatível, instale-o com `python -m playwright install chromium`, de acordo com o ambiente local.
 
 Os testes de servidor medidos cobrem **45 casos aprovados**, incluindo resposta da API, validação e extração simulada. Os **dois testes de paridade e cenários obrigatórios** também passaram: foram comparados **2.624 casos, com zero divergências** entre scikit-learn, Flask e JavaScript. A navegação móvel também foi aprovada no Chromium 156 via Playwright em 390 × 844 pixels, nos modos Flask e estático sob o prefixo do repositório: maçaneta normal, falta de água prioritária, fiação exposta prioritária, formulário incompleto e inteiros inválidos. Os três exemplos preenchíveis, foco por teclado, ausência de rolagem horizontal e ausência de erros de console foram verificados. O modo Flask fez quatro previsões pela API; o estático fez zero chamadas à API. Evidências: [relatorios/testes_automatizados.json](relatorios/testes_automatizados.json), [captura Flask](relatorios/celular_flask.png) e [captura estática](relatorios/celular_pages_local.png).
 
 ## Publicar no GitHub Pages
 
 A versão pública é estática: a interface informa **modo demonstração**, carrega a árvore JSON e prevê no navegador. Não existe servidor Flask nem credencial de API no GitHub Pages. Os caminhos relativos permitem hospedar em `/priorizacao-chamados-manutencao/`.
+
+Se a pasta foi extraída do pacote ZIP e ainda não contém um repositório Git, inicialize-a e configure o repositório novo:
+
+```bash
+git init -b main
+git remote add origin https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao.git
+```
+
+Em uma cópia já clonada, preserve o remoto existente. Com a integração autorizada para o repositório, execute:
 
 ```bash
 python scripts/preparar_pages.py
@@ -157,7 +167,9 @@ git push origin main
 
 No GitHub, abra **Settings → Pages**, selecione a publicação a partir da branch `main`, pasta `/docs`, e salve. Depois da implantação, abra a URL retornada pelo GitHub e execute um dos exemplos fictícios. As instruções pressupõem um repositório novo, público e vazio; não é necessário alterar repositórios existentes.
 
-**Repositório:** [GuilhermeDevSoftware/priorizacao-chamados-manutencao](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao), criado pelo titular após a credencial conectada recusar a operação `CreateRepository`. O acesso de escrita foi verificado. A disponibilização do código e do Pages deve ser confirmada pelas evidências da publicação; o link de demonstração será acrescentado quando verificado.
+**Publicação verificada em 15/11/2026:** [repositório público](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao) e [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/). O envio para `main`, a referência remota e a implantação do Pages foram verificados. A URL pública foi aberta em Chromium móvel (390 × 844 pixels): maçaneta → normal, falta de água → prioritário e fiação exposta → prioritário; formulário incompleto, valores inválidos, teclado, ausência de rolagem horizontal e ausência de erros de console também foram aprovados. Evidências: [teste público](relatorios/teste_pages_publico.json) e [captura da demonstração pública](relatorios/celular_pages_publico.png). Os impedimentos de acesso ao GitHub foram resolvidos pelo titular. A execução do notebook foi validada localmente; o [link para abrir no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb) respondeu HTTP 200, mas não houve execução autenticada no Google Colab.
+
+A publicação está registrada em [relatorios/publicacao.json](relatorios/publicacao.json). Há também uma [prévia privada no Sites](https://prioriza-guilherme-costa-2026.evenmoat8.chatgpt.site), acessível somente ao proprietário; o link público para apresentação é o GitHub Pages.
 
 ## Coletar e validar dados reais
 
@@ -169,6 +181,8 @@ Dois responsáveis com conhecimento de manutenção devem rotular os casos indep
 
 ## Arquivos de entrega
 
+O pacote completo e os anexos separados estão na [versão de entrega para o Classroom](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/entrega-academica-2026-11-15).
+
 - `Projeto_Chamados_Manutencao.ipynb`: notebook com saídas.
 - `dados/`: CSV fictício e identificação da divisão por famílias.
 - `modelo/`: árvore JSON, estimador e regras legíveis.
@@ -176,6 +190,6 @@ Dois responsáveis com conhecimento de manutenção devem rotular os casos indep
 - `docs/`: versão estática preparada para GitHub Pages.
 - `tests/`, `scripts/` e arquivos de dependências: reprodução e verificação.
 - `relatorios/`: métricas, previsões e evidências dos testes.
-- `docs_academicos/`: relatório acadêmico, checklist do Classroom e roteiro de apresentação.
+- `docs_academicos/`: relatório acadêmico em Markdown e PDF, checklist do Classroom e roteiro de apresentação.
 
 Não há armazenamento de chamados enviados pela interface. A entrega no Google Classroom deve ser feita pelo titular com os arquivos deste projeto; publicação em GitHub ou entrega de um ZIP não representa envio ao Classroom.

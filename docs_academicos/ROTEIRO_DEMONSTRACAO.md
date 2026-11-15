@@ -1,11 +1,12 @@
 # Roteiro de demonstração
 
-**Integrante único:** Guilherme Costa  
+**Integrante único:** Guilherme Costa
+
 **Projeto:** Sistema Inteligente para Priorização de Chamados de Manutenção
 
 ## Preparação
 
-Execute `python app.py` e abra `http://127.0.0.1:5000`, ou utilize o link público somente após sua publicação ser verificada. Na página estática, confira a indicação de modo demonstração. Explique no início que os chamados e os rótulos foram criados para fins acadêmicos.
+Execute `python app.py` e abra `http://127.0.0.1:5000`, ou utilize a [demonstração pública verificada](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/). Na página estática, confira a indicação de modo demonstração. Explique no início que os chamados e os rótulos foram criados para fins acadêmicos.
 
 ## Apresentação de aproximadamente cinco minutos
 

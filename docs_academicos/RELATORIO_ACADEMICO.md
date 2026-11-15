@@ -1,8 +1,11 @@
 # Relatório acadêmico
 
-**Sistema Inteligente para Priorização de Chamados de Manutenção**  
-Curso: Engenharia de Computação  
-Integrante único: **Guilherme Costa**  
+**Sistema Inteligente para Priorização de Chamados de Manutenção**
+
+Curso: Engenharia de Computação
+
+Integrante único: **Guilherme Costa**
+
 Prazo de entrega: **20/11/2026**
 
 ## 1. Problema e objetivo
@@ -64,4 +67,6 @@ Para avançar, é necessário firmar parceria com uma instituição e padronizar
 
 Os arquivos incluem notebook executado, CSV, árvore JSON, código Flask, interface estática, dependências, testes e instruções de reprodução. Guilherme Costa é o único integrante.
 
-O repositório público novo [GuilhermeDevSoftware/priorizacao-chamados-manutencao](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao) foi criado pelo titular após a credencial conectada recusar sua criação pela falta da permissão `CreateRepository`. O acesso de escrita foi verificado. O estado da publicação do código e do GitHub Pages será registrado após a verificação correspondente. Os arquivos estão organizados para anexação ao Google Classroom; não foi realizado envio à plataforma.
+O código está publicado no [repositório público do projeto](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao), e a [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/) foi implantada e verificada em 15/11/2026. Os impedimentos iniciais de acesso foram resolvidos pelo titular. Na URL pública, o Chromium em tela de celular (390 × 844 pixels) confirmou os resultados normal, prioritário e prioritário para maçaneta, falta de água e fiação exposta. Formulário incompleto, valores inválidos, teclado, ausência de rolagem horizontal e ausência de erros de console também foram aprovados. As evidências estão em `relatorios/teste_pages_publico.json` e `relatorios/celular_pages_publico.png`.
+
+O [link para abrir o notebook no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb) respondeu HTTP 200 e disponibiliza a versão do GitHub; não representa execução verificada no serviço Google. O notebook entregue contém as saídas verificadas da execução local.

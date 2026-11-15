@@ -1,0 +1,31 @@
+{
+  "data_verificacao": "2026-11-15",
+  "repositorio": {
+    "url": "https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao",
+    "publico": true,
+    "branch": "main",
+    "estado": "Código enviado e notebook público lido de volta com 10 células executadas, sem saída de erro."
+  },
+  "github_pages": {
+    "url": "https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/",
+    "fonte": "main /docs",
+    "estado_github": "built",
+    "workflow_id": 43746823346,
+    "workflow_resultado": "success",
+    "verificacao": "Chromium real via Playwright, viewport 390x844; três previsões obrigatórias, incompleto, valores inválidos, teclado e ausência de rolagem horizontal aprovados.",
+    "evidencia": "relatorios/teste_pages_publico.json"
+  },
+  "colab": {
+    "url_para_abrir": "https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb",
+    "http": 200,
+    "execucao_no_colab_verificada": false,
+    "execucao_entregue": "Kernel local limpo com nbclient no Codex Cloud"
+  },
+  "sites": {
+    "url": "https://prioriza-guilherme-costa-2026.evenmoat8.chatgpt.site",
+    "acesso": "Prévia privada, somente proprietário; a demonstração pública está no GitHub Pages.",
+    "estado_deploy_nativo": "succeeded"
+  },
+  "acesso": "O titular criou o repositório, autorizou a instalação GitHub para este projeto e ativou main /docs no Pages. Bloqueios iniciais de criação, escrita e configuração resolvidos.",
+  "classroom": "Arquivos preparados para anexação; nenhum envio à atividade foi realizado."
+}
