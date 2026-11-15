@@ -223,6 +223,8 @@ Antes de enviar, confira `git status` para garantir que a pasta `instance/` e o 
 
 Links do projeto: [repositório público](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao), [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/) e [notebook para abrir no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb). O notebook contém saídas da execução local, não da execução no serviço Google.
 
+A demonstração v2 foi implantada e testada na URL pública em Chromium móvel (390 × 844): quatro exemplos fixos e filtros, edição bloqueada, três previsões obrigatórias, campos incompletos e valores inválidos, sem erros de console. Evidências: [painel público](relatorios/testes_evolucao_pages_publico.json) e [previsões públicas](relatorios/teste_pages_publico_v2.json).
+
 A [entrega v1](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/entrega-academica-2026-11-15) permanece como registro histórico. A evolução tem [pacote e evidências próprios na versão v2.0.0](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v2.0.0). A prévia privada no Sites é uma cópia independente da demonstração e não hospeda o Flask nem o SQLite.
 
 ## Coletar e validar dados reais

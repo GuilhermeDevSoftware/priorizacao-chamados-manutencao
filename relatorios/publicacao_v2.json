@@ -1,0 +1,23 @@
+{
+  "versao": "v2.0.0",
+  "commit_codigo_testado": "c72b420f93c7b599a8a8891a133016e21a4667cd",
+  "repositorio": "https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao",
+  "github_pages": {
+    "url": "https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/",
+    "workflow_id": 43773313349,
+    "resultado": "success",
+    "evidencias": [
+      "relatorios/testes_evolucao_pages_publico.json",
+      "relatorios/teste_pages_publico_v2.json"
+    ]
+  },
+  "sites": {
+    "url": "https://prioriza-guilherme-costa-2026.evenmoat8.chatgpt.site",
+    "acesso": "Somente proprietário",
+    "deploy": "succeeded"
+  },
+  "armazenamento": "Apenas Flask local; instance/chamados.sqlite3 e instance/uploads, ignorados pelo Git",
+  "IA_multimodal_real_validada": false,
+  "dados_publicos": "Somente exemplos fictícios; sem banco ou uploads cadastrados",
+  "release": "https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v2.0.0"
+}

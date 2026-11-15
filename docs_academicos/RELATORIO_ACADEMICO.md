@@ -81,6 +81,8 @@ Os arquivos da evolução incluem notebook executado, CSV fictício, árvore JSO
 
 O projeto utiliza o [repositório público existente](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao) e a [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/). A primeira entrega permanece preservada como registro histórico; a evolução tem [pacote próprio v2.0.0](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v2.0.0). A demonstração pública usa somente exemplos fictícios e não hospeda o Flask nem o banco.
 
+A implantação v2 foi verificada na URL pública em Chromium móvel (390 x 844): painel com quatro exemplos fixos e filtros, atualizações desabilitadas com explicação, previsões dos três casos obrigatórios e validações aprovadas, sem erros de console. A evidência está em relatorios/testes_evolucao_pages_publico.json.
+
 O [link para abrir o notebook no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb) disponibiliza a versão do GitHub. O notebook entregue contém as saídas verificadas da execução local.
 
 Para demonstrar a persistência, é necessário iniciar o Flask no computador, cadastrar um chamado, fechar o servidor e reiniciá-lo usando a mesma pasta `instance/`. Banco e uploads precisam ser mantidos juntos no backup. A entrega ao Google Classroom é realizada pelo titular; este pacote não representa envio à atividade.

@@ -1,0 +1,61 @@
+{
+  "executado_em_utc": "2026-11-15T23:11:03.226479+00:00",
+  "ambiente": "Codex Cloud Linux; Chromium real via Playwright, modo headless",
+  "dados": "Somente chamados fictícios",
+  "navegador": "156.0.8078.79",
+  "paridade": null,
+  "fluxos": [
+    {
+      "modo": "pages_publico",
+      "url": "https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/",
+      "viewport": "390x844",
+      "configuracao": {
+        "modo": "demonstracao",
+        "extracao_habilitada": false,
+        "armazenamento_habilitado": false
+      },
+      "cenarios": [
+        {
+          "cenario": "Maçaneta frouxa em sala desocupada",
+          "resultado": "Normal",
+          "status": "aprovado"
+        },
+        {
+          "cenario": "Falta de água na escola",
+          "resultado": "Prioritário",
+          "status": "aprovado"
+        },
+        {
+          "cenario": "Fiação exposta em local com pouca circulação",
+          "resultado": "Prioritário",
+          "status": "aprovado"
+        },
+        {
+          "cenario": "Formulário incompleto",
+          "resultado": "campo obrigatório rejeitado",
+          "status": "aprovado"
+        },
+        {
+          "cenario": "Valores -1 e 1,5",
+          "resultado": "inteiros inválidos rejeitados",
+          "status": "aprovado"
+        }
+      ],
+      "exemplos_preenchiveis": [
+        "macaneta",
+        "agua",
+        "fiacao"
+      ],
+      "extracao_sem_credencial": "botão desabilitado",
+      "teclado": "foco útil após Tab",
+      "rolagem_horizontal": false,
+      "chamadas_post_api_prever": 0,
+      "respostas_api_prever": [],
+      "erros_console": [],
+      "erros_pagina": [],
+      "captura": "relatorios/celular_pages_publico_v2.png",
+      "status": "aprovado"
+    }
+  ],
+  "status": "aprovado"
+}
