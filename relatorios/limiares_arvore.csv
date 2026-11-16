@@ -1,0 +1,8 @@
+no,atributo,limiar_aprendido,primeiro_inteiro_ramo_direito,condicao_ramo_direito,limiar_politica_correspondente,equivalente_em_inteiros,interpretacao
+0,servico_essencial_interrompido,0.5,1,servico_essencial_interrompido >= 1,1,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.
+1,risco_seguranca,0.5,1,risco_seguranca >= 1,1,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.
+2,pessoas_afetadas,39.5,40,pessoas_afetadas >= 40,40,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.
+3,dias_aguardando,13.5,14,dias_aguardando >= 14,14,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.
+5,recorrente,0.5,1,recorrente >= 1,1,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.
+7,pessoas_afetadas,9.5,10,pessoas_afetadas >= 10,10,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.
+10,dias_aguardando,6.5,7,dias_aguardando >= 7,7,True,Corte intermediário entre inteiros consecutivos; mesma fronteira da política.

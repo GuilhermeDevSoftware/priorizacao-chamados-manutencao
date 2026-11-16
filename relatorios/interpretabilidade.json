@@ -1,0 +1,120 @@
+{
+  "origem": "Dados inteiramente fictícios; modelo publicado preservado.",
+  "modelo_sha256": "cda185f9d8ed33c5c098737166f1b8a408122186946e724d92c525b5dc83c475",
+  "profundidade": 6,
+  "nos": 15,
+  "amostras_treino": 96,
+  "importancias": [
+    {
+      "atributo": "risco_seguranca",
+      "importancia": 0.22717508055853908
+    },
+    {
+      "atributo": "servico_essencial_interrompido",
+      "importancia": 0.2524167561761548
+    },
+    {
+      "atributo": "pessoas_afetadas",
+      "importancia": 0.21445272053174785
+    },
+    {
+      "atributo": "dias_aguardando",
+      "importancia": 0.22393603836572953
+    },
+    {
+      "atributo": "recorrente",
+      "importancia": 0.08201940436782863
+    }
+  ],
+  "limiares": [
+    {
+      "no": 0,
+      "atributo": "servico_essencial_interrompido",
+      "limiar_aprendido": 0.5,
+      "primeiro_inteiro_ramo_direito": 1,
+      "condicao_ramo_direito": "servico_essencial_interrompido >= 1",
+      "limiar_politica_correspondente": 1,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    },
+    {
+      "no": 1,
+      "atributo": "risco_seguranca",
+      "limiar_aprendido": 0.5,
+      "primeiro_inteiro_ramo_direito": 1,
+      "condicao_ramo_direito": "risco_seguranca >= 1",
+      "limiar_politica_correspondente": 1,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    },
+    {
+      "no": 2,
+      "atributo": "pessoas_afetadas",
+      "limiar_aprendido": 39.5,
+      "primeiro_inteiro_ramo_direito": 40,
+      "condicao_ramo_direito": "pessoas_afetadas >= 40",
+      "limiar_politica_correspondente": 40,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    },
+    {
+      "no": 3,
+      "atributo": "dias_aguardando",
+      "limiar_aprendido": 13.5,
+      "primeiro_inteiro_ramo_direito": 14,
+      "condicao_ramo_direito": "dias_aguardando >= 14",
+      "limiar_politica_correspondente": 14,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    },
+    {
+      "no": 5,
+      "atributo": "recorrente",
+      "limiar_aprendido": 0.5,
+      "primeiro_inteiro_ramo_direito": 1,
+      "condicao_ramo_direito": "recorrente >= 1",
+      "limiar_politica_correspondente": 1,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    },
+    {
+      "no": 7,
+      "atributo": "pessoas_afetadas",
+      "limiar_aprendido": 9.5,
+      "primeiro_inteiro_ramo_direito": 10,
+      "condicao_ramo_direito": "pessoas_afetadas >= 10",
+      "limiar_politica_correspondente": 10,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    },
+    {
+      "no": 10,
+      "atributo": "dias_aguardando",
+      "limiar_aprendido": 6.5,
+      "primeiro_inteiro_ramo_direito": 7,
+      "condicao_ramo_direito": "dias_aguardando >= 7",
+      "limiar_politica_correspondente": 7,
+      "equivalente_em_inteiros": true,
+      "interpretacao": "Corte intermediário entre inteiros consecutivos; mesma fronteira da política."
+    }
+  ],
+  "consistencia_celulas": {
+    "representantes": 512,
+    "divergencias": 0,
+    "natureza": "Verificação de consistência em representantes das células dos cortes; não validação externa."
+  },
+  "recuperou_fronteiras_politica": true,
+  "interpretacao": "A árvore recuperou a política nos domínios inteiros verificados. Os cortes 39,5/6,5 e 9,5/13,5 equivalem a pessoas >= 40 e dias >= 7, ou pessoas >= 10 e dias >= 14; 0,5 separa os indicadores 0/1. A ordem dos testes reorganiza a expressão lógica. Não se trata de descoberta de critérios reais: os rótulos foram gerados pela própria política.",
+  "limites": [
+    "Cortes intermediários são equivalentes para inteiros consecutivos; outras amostras podem gerar cortes diferentes em lacunas sem exemplos.",
+    "Importância por redução de impureza descreve este ajuste e pode favorecer variáveis com mais cortes; não demonstra causalidade.",
+    "A ordem e a frequência dos atributos refletem a base pequena e a distribuição artificial dos cenários.",
+    "Verificações derivadas da política medem consistência, não desempenho em manutenção real."
+  ],
+  "versoes": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit_learn": "1.8.0"
+  }
+}
