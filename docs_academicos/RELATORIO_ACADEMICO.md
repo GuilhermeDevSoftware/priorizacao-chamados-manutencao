@@ -1,88 +1,221 @@
-# Relatório acadêmico
+# Relatório acadêmico de Inteligência Artificial
 
 **Sistema Inteligente para Priorização de Chamados de Manutenção**
 
-Curso: Engenharia de Computação
+**Engenharia de Computação · Integrante único: Guilherme Costa**
 
-Integrante único: **Guilherme Costa**
+## 1. Problema, hipótese e papel do ML
 
-Prazo de entrega: **20/11/2026**
+O protótipo apoia a triagem de manutenção por uma pessoa. A prioridade usa cinco campos confirmados; o experimento textual sugere equipe a partir da descrição. Toda a base é fictícia e a foto não entra em nenhum dos modelos treinados aqui.
 
-Versão: **v2 - fotos, equipes e SQLite local**
+A prioridade foi rotulada por uma política determinística conhecida. Nesse contexto, regras explícitas são uma solução suficiente e mais direta: os resultados não justificam substituir regras estáveis por ML. O objetivo acadêmico dos modelos aprendidos é estudar generalização entre famílias, incerteza, erros, sensibilidade a ruído e limites de aprender a partir de poucos exemplos. Uma aplicação operacional exigiria rótulos reais independentes, especialistas e avaliação prospectiva.
 
-## 1. Problema e objetivo
+## 2. Dados, política e separação
 
-Escolas, ONGs e pequenas instituições podem ter equipes de manutenção reduzidas. Um defeito que apresenta risco ou interrompe um serviço essencial precisa ser identificado cedo. O projeto propõe um protótipo que recebe as características de um chamado e sugere classe 0 (normal) ou 1 (prioritário), deixando a decisão final com o responsável.
+O desenvolvimento contém 96 registros em 24 famílias; os 24 registros de 6 famílias reservadas permanecem separados. A divisão original é a primeira partição do StratifiedGroupKFold com embaralhamento e semente 42. O reservado já havia sido consultado no protótipo; seu uso agora é continuidade e exploração, não nova confirmação independente.
 
-O objetivo acadêmico é demonstrar a integração entre uma base estruturada, um modelo de aprendizagem de máquina, uma API, uma interface acessível e armazenamento local. A evolução v2 acrescenta foto opcional, sugestão e confirmação de equipe, histórico em SQLite e acompanhamento por status. Não houve implantação operacional nem validação com chamados reais.
+X = risco_seguranca, servico_essencial_interrompido, pessoas_afetadas, dias_aguardando e recorrente; y = prioridade. A política dá classe 1 por risco ou serviço essencial interrompido, ou por pessoas >= 40 e dias >= 7, ou por recorrência com pessoas >= 10 e dias >= 14. Os demais casos recebem classe 0.
 
-## 2. Dados e critérios
+As colunas equipe_rotulo e equipe_justificativa foram acrescentadas por anotação editorial didática de família. As colunas originais, os rótulos de prioridade e os artefatos do aplicativo foram preservados. A taxonomia e as justificativas estão em [rotulagem de equipes](../dados/rotulagem_equipes.md).
 
-A base é integralmente fictícia: 120 registros, 30 famílias de cenários e quatro variações por família. Ela inclui maçaneta frouxa em sala desocupada, falhas de água, fiação exposta, reparos estéticos e fronteiras de quantidade de pessoas e tempo de espera. Os registros possuem ID, descrição, família, origem e justificativa do rótulo.
+## 3. Baselines e validação agrupada repetida
 
-As cinco entradas são `risco_seguranca`, `servico_essencial_interrompido`, `pessoas_afetadas`, `dias_aguardando` e `recorrente`. O alvo é `prioridade`. Risco, serviço essencial e recorrência usam valores binários; pessoas e dias são inteiros não negativos. Descrição e ID não entram no treinamento.
+Foram executadas 10 repetições com sementes distintas, cada uma com cinco folds somente no desenvolvimento. Todas as variações de uma família permanecem juntas. A padronização da regressão logística é ajustada exclusivamente no treino de cada fold. A árvore usa profundidade máxima 6 e semente 42; os hiperparâmetros dos demais modelos são fixos e estão no JSON. A comparação não é uma nova seleção aninhada da profundidade escolhida no protótipo.
 
-A classe prioritária foi atribuída se houver risco à segurança, serviço essencial interrompido, pelo menos 40 pessoas afetadas com 7 dias de espera ou recorrência com pelo menos 10 pessoas e 14 dias. Os demais exemplos recebem classe normal. Esses limiares foram definidos antes do treinamento para fins didáticos; não são normas universais. Pouca circulação não elimina risco elétrico.
+A tabela mostra média ± desvio-padrão amostral das métricas OOF agregadas por repetição. Sensibilidade, precisão, F1 e F2 referem-se à classe prioritária; acurácia é global. F2 dá peso maior à sensibilidade. Divisões por zero recebem zero, documentadas no código.
 
-## 3. Método
+| Modelo | Sensibilidade | Precisão | F1 | F2 | Acurácia |
+| --- | --- | --- | --- | --- | --- |
+| Dummy maioria | 0,5510 ± 0,0000 | 0,4500 ± 0,0000 | 0,4954 ± 0,0000 | 0,5273 ± 0,0000 | 0,4271 ± 0,0000 |
+| Política explícita | 1,0000 ± 0,0000 | 1,0000 ± 0,0000 | 1,0000 ± 0,0000 | 1,0000 ± 0,0000 | 1,0000 ± 0,0000 |
+| Árvore atual | 0,9816 ± 0,0244 | 0,9628 ± 0,0278 | 0,9718 ± 0,0170 | 0,9776 ± 0,0194 | 0,9708 ± 0,0176 |
+| Regressão logística | 0,7082 ± 0,0099 | 0,9285 ± 0,0233 | 0,8033 ± 0,0079 | 0,7433 ± 0,0077 | 0,8229 ± 0,0085 |
+| Random forest | 1,0000 ± 0,0000 | 0,9705 ± 0,0138 | 0,9850 ± 0,0070 | 0,9939 ± 0,0029 | 0,9844 ± 0,0074 |
 
-A validação com pandas verifica tamanho, IDs únicos, tipos, ausência de nulos, domínio dos binários, distribuição das famílias e coerência dos rótulos. A divisão usa a primeira partição fixa de `StratifiedGroupKFold` com cinco partições, embaralhamento e semente 42. Foram separados 96 registros de treino e 24 de teste, sem famílias compartilhadas. No treino há 47 normais e 49 prioritários; no teste há 10 normais e 14 prioritários. A diferença de proporções resulta da preservação dos grupos.
+Intervalos de confiança percentis de 95%: bootstrap de famílias inteiras, mantendo juntas todas as variações e repetições, com 1000 reamostragens. A estatística reamostrada é a média das métricas OOF por repetição. Não se tratam os folds nem as repetições sobrepostas como novas observações independentes.
 
-O modelo é `DecisionTreeClassifier(random_state=42)`. A profundidade foi ajustada com validação cruzada agrupada em quatro partições exclusivamente no treino, comparando profundidades 1, 2, 3, 4, 5, 6 e ilimitada. O critério F2 dá mais peso à sensibilidade da classe prioritária; empates favorecem a menor profundidade entre os candidatos. A profundidade escolhida e aprendida foi 6. O teste permaneceu reservado até a avaliação final.
+| Modelo | sensibilidade | precisao | f1 | f2 | acuracia |
+| --- | --- | --- | --- | --- | --- |
+| Dummy maioria | [0,4450; 0,6679] | [0,2825; 0,6206] | [0,3561; 0,6013] | [0,4117; 0,6191] | [0,3521; 0,5042] |
+| Política explícita | [1,0000; 1,0000] | [1,0000; 1,0000] | [1,0000; 1,0000] | [1,0000; 1,0000] | [1,0000; 1,0000] |
+| Árvore atual | [0,9588; 0,9958] | [0,9228; 0,9874] | [0,9446; 0,9885] | [0,9551; 0,9918] | [0,9531; 0,9854] |
+| Regressão logística | [0,4635; 0,8810] | [0,8184; 1,0000] | [0,6025; 0,9154] | [0,5126; 0,8922] | [0,7208; 0,9167] |
+| Random forest | [1,0000; 1,0000] | [0,9242; 1,0000] | [0,9603; 1,0000] | [0,9836; 1,0000] | [0,9625; 1,0000] |
 
-O comparador `DummyClassifier(strategy="most_frequent")` foi ajustado no mesmo treino. Sua classe majoritária é 1. Esse comparador permite verificar se a árvore acrescenta algo além de repetir o rótulo mais comum.
+Os intervalos são condicionais às famílias sintéticas observadas; não incluem toda a incerteza de geração, rotulagem e mudança de instituição. Um intervalo [1;1] para regras não prova segurança em dados reais.
 
-## 4. Resultados medidos no teste reservado
+### Teste reservado para continuidade
 
-| Modelo | Sensibilidade da classe 1 | Precisão da classe 1 | Acurácia |
-| --- | ---: | ---: | ---: |
-| Árvore de decisão | 100,00% | 100,00% | 100,00% |
-| Classe mais frequente do treino | 100,00% | 58,33% | 58,33% |
+| Modelo | Sensibilidade | Precisão | F1 | F2 | Acurácia |
+| --- | --- | --- | --- | --- | --- |
+| Dummy maioria | 1,0000 | 0,5833 | 0,7368 | 0,8750 | 0,5833 |
+| Política explícita | 1,0000 | 1,0000 | 1,0000 | 1,0000 | 1,0000 |
+| Árvore atual | 1,0000 | 1,0000 | 1,0000 | 1,0000 | 1,0000 |
+| Regressão logística | 0,8571 | 1,0000 | 0,9231 | 0,8824 | 0,9167 |
+| Random forest | 1,0000 | 1,0000 | 1,0000 | 1,0000 | 1,0000 |
 
-A matriz da árvore é `[[10, 0], [0, 14]]`; a do comparador é `[[0, 10], [0, 14]]`. Linhas representam as classes reais e colunas as previstas, na ordem 0 e 1. A árvore classificou corretamente os 24 exemplos reservados. O comparador identificou todos os prioritários ao prever 1 para todos, mas marcou incorretamente os dez normais.
+Fonte: [comparacao_modelos.json](../relatorios/comparacao_modelos.json). A árvore no reservado é o estimador original; na CV são ajustadas novas árvores com a mesma configuração, em treinos menores.
 
-Não houve falsos negativos no teste reservado; portanto não existem exemplos observados desse erro para apresentar. Isso não elimina o risco de falsos negativos em dados reais ou em novas situações. Métricas, validação cruzada e previsões individuais estão nos arquivos de `relatorios/`.
+## 4. Interpretabilidade da árvore preservada
 
-## 5. Arquitetura da evolução v2
+A árvore possui profundidade 6, 15 nós e foi ajustada nos 96 registros originais de treino. Os cortes recuperam a política neste domínio inteiro.
 
-A interface responsiva continua usando HTML, CSS e JavaScript puro. A versão local distingue as ações de sugerir campos/equipe, analisar prioridade e salvar chamado. O cadastro exige descrição, local, cinco campos confirmados e equipe confirmada; a foto é opcional. A prioridade permanece legível por texto, e equipe, prioridade e status aparecem separadamente.
+| Campo | Corte aprendido | Primeiro inteiro à direita | Equivalente |
+| --- | --- | --- | --- |
+| servico_essencial_interrompido | 0.5 | 1 | Sim |
+| risco_seguranca | 0.5 | 1 | Sim |
+| pessoas_afetadas | 39.5 | 40 | Sim |
+| dias_aguardando | 13.5 | 14 | Sim |
+| recorrente | 0.5 | 1 | Sim |
+| pessoas_afetadas | 9.5 | 10 | Sim |
+| dias_aguardando | 6.5 | 7 | Sim |
 
-O Flask serve a interface e preserva `POST /api/prever`. O servidor valida os campos e percorre a árvore JSON; ao salvar, calcula novamente a classe. A fotografia e o texto não alteram diretamente a árvore. A evolução reutiliza os artefatos do treinamento original e não muda suas métricas.
+Os cortes intermediários entre inteiros consecutivos são numericamente diferentes dos limiares escritos, mas representam a mesma decisão. Em outras amostras pequenas, cortes equivalentes sobre os pontos observados podem divergir em regiões não cobertas; por isso a análise de fronteiras e OOF é necessária. Importância por redução de impureza descreve esta árvore, sem interpretação causal e sem medir relevância universal.
 
-A análise opcional em `POST /api/analisar` recebe descrição e foto e consulta a OpenAI com resposta estruturada: tipo de defeito, indícios observados, áreas envolvidas, equipe sugerida, justificativa, campos e informações a confirmar. Ausências permanecem desconhecidas. A foto não permite presumir pessoas afetadas, dias ou recorrência. A pessoa revisa os campos e confirma ou altera a equipe. A chave fica somente em variável de ambiente ou `.env` local ignorado pelo Git.
+![Árvore aprendida](../relatorios/figuras/arvore_publicada.png)
 
-Sem chave ou com falha do serviço externo, uma regra textual local pode sugerir uma única equipe identificada, sem inventar campos da árvore nem afirmar que analisou a imagem. As equipes são TI, Elétrica, Hidráulica e Triagem geral; ambiguidade e múltiplas áreas resultam em Triagem geral. A equipe sugerida fica preservada mesmo se a equipe confirmada for corrigida. Cadastrar não depende da disponibilidade da API externa.
+![Importâncias da árvore](../relatorios/figuras/importancias_arvore.png)
 
-O armazenamento usa `sqlite3`, da biblioteca padrão do Python, com criação automática do banco e consultas parametrizadas. Cada chamado recebe ID, descrição, local, data de abertura UTC, campos da árvore, prioridade, equipe sugerida, equipe confirmada e status. A justificativa e a análise disponível também são guardadas para consulta. O status começa em Aberto e pode mudar para Em atendimento ou Resolvido.
+Fonte: [interpretabilidade.json](../relatorios/interpretabilidade.json), export_text e limiares_arvore.csv.
 
-O banco fica em `instance/chamados.sqlite3`; fotos ficam em `instance/uploads/`, e somente o caminho relativo é armazenado no SQLite. São aceitos JPEG, PNG e WebP até 5 MiB e 25 megapixels, com verificação da decodificação, correção de orientação, remoção de metadados e normalização para JPEG com lado máximo de 2.048 pixels. O nome é gerado pelo servidor. Banco, fotos cadastradas e segredos ficam fora do repositório e da publicação.
+## 5. Fronteiras e análise de erros
 
-O painel permite listar e consultar chamados, filtrar equipe confirmada, prioridade e status e atualizar equipe/status. Na demonstração estática do GitHub Pages, a árvore roda em JavaScript e o painel usa quatro exemplos fictícios fixos somente para consulta e filtros. A prévia de foto pode ocorrer no navegador; análise multimodal, gravação e atualização exigem Flask em execução.
+A grade contém 800 combinações únicas: os dois blocos de pessoas e de dias ao redor dos limiares, cruzados com risco, essencial e recorrência binários. É uma verificação de consistência derivada da própria política, não validação externa.
 
-## 6. Verificação e local de execução
+| Modelo | Divergências | FN | FP | FN/positivos |
+| --- | --- | --- | --- | --- |
+| Dummy maioria | 137 | 0 | 137 | 0,0000 |
+| Política explícita | 0 | 0 | 0 | 0,0000 |
+| Árvore atual | 0 | 0 | 0 | 0,0000 |
+| Regressão logística | 53 | 33 | 20 | 0,0498 |
+| Random forest | 6 | 6 | 0 | 0,0090 |
 
-O treinamento e a execução do notebook ocorreram no ambiente local Codex Cloud, com Python 3.12 e scikit-learn 1.8.0. As dez células de código foram executadas em ordem, sem erro, e as saídas foram salvas. O notebook é autocontido e compatível com o Colab; não se afirma execução no serviço Google.
+As taxas por região, com denominadores e ausência de positivos identificada como nulo, estão em [falsos_negativos_regioes.csv](../relatorios/falsos_negativos_regioes.csv). A ausência de divergência da árvore publicada nessa grade não implica que árvores treinadas em outros subconjuntos recuperem todos os cortes.
 
-As evidências históricas da primeira versão registram 47 testes aprovados e 2.624 casos de paridade sem divergências entre scikit-learn, Flask e JavaScript. O Chromium 156 foi usado em tela de 390 x 844 pixels, tanto no Flask quanto na demonstração pública. Essas verificações documentam a v1 e não validam por si só as funções adicionadas na evolução.
+![Fronteiras da árvore](../relatorios/figuras/fronteiras_arvore.png)
 
-A evolução v2 passou em 110 testes pytest, incluindo a paridade de 2.624 casos sem divergências. No Chromium 156 em 390 x 844, foram cadastrados quatro chamados fictícios: fiação exposta com imagem sintética, vazamento sem foto, TI e caso com duas áreas. A prévia e remoção da imagem, rejeição de arquivo inválido, confirmação, revisão de equipe e status e filtros combinados passaram. Depois de encerrar o processo Flask e iniciar outro com o mesmo SQLite e uploads, os quatro registros permaneceram disponíveis e a foto manteve o mesmo SHA256. O painel estático com quatro exemplos fixos foi verificado sob o prefixo do repositório. Não houve erros de console ou rolagem horizontal. As evidências estão em relatorios/testes_evolucao_navegador.json.
+![Fronteiras da regressão logística](../relatorios/figuras/fronteiras_logistica.png)
 
-Sete verificações de interface da análise multimodal passaram com respostas simuladas, incluindo campos desconhecidos, confirmação humana, falha externa e preservação do preenchimento manual. Não havia chave configurada e nenhuma chamada real à OpenAI foi realizada. A câmera física não foi exercitada; a seleção de arquivo, prévia, remoção e o atributo de captura móvel foram verificados. O registro está em relatorios/teste_extracao_interface_v2.json.
+![Fronteiras da random forest](../relatorios/figuras/fronteiras_randomforest.png)
 
-## 7. Limitações e continuidade
+### Erros OOF mesmo com teste reservado perfeito
 
-A base pequena, fictícia e rotulada por regras explícitas explica o desempenho perfeito observado. Esse resultado mede a reprodução da política didática nesses exemplos e não estima a segurança ou utilidade em uma instituição real. A separação por família evita misturar variações de um cenário, mas não torna os dados independentes de todos os padrões compartilhados. A classificação binária também não representa sozinha critérios como disponibilidade de equipe, custo, materiais e procedimentos de emergência.
+| Modelo | Ocorrências erradas | Falsos negativos |
+| --- | --- | --- |
+| Dummy maioria | 550 | 220 |
+| Política explícita | 0 | 0 |
+| Árvore atual | 28 | 9 |
+| Regressão logística | 170 | 143 |
+| Random forest | 15 | 0 |
 
-Para avançar, é necessário firmar parceria com uma instituição e padronizar a coleta. Devem ser minimizados e anonimizados nomes, contatos e detalhes identificáveis, com controle de acesso, retenção definida e base legal para o tratamento. A rotulagem deve ser feita por dois avaliadores com conhecimento técnico e consenso para divergências. A divisão futura deve separar chamados relacionados e períodos, preservando dados realmente novos para teste. Um piloto supervisionado deverá monitorar falsos negativos, diferenças entre contextos e a carga da equipe antes de qualquer uso operacional.
+Ocorrências incluem o mesmo ID em repetições diferentes, portanto não são quantidade de chamados independentes. A lista integral contém ID, família, seed, fold, campos, classe real e prevista em [erros_oof_modelos.csv](../relatorios/erros_oof_modelos.csv). Exemplos medidos da árvore:
 
-## 8. Entrega e publicação
+| ID | Família | Real | Previsto | Erro |
+| --- | --- | --- | --- | --- |
+| FIC-051 | som_auditorio | 1 | 0 | falso_negativo |
+| FIC-116 | acustica_oficina | 1 | 0 | falso_negativo |
+| FIC-118 | computadores_auxiliares | 1 | 0 | falso_negativo |
+| FIC-047 | laboratorio_tomadas | 0 | 1 | falso_positivo |
+| FIC-115 | acustica_oficina | 0 | 1 | falso_positivo |
+| FIC-012 | lampada_deposito | 0 | 1 | falso_positivo |
+| FIC-053 | banheiro_recorrente | 0 | 1 | falso_positivo |
+| FIC-024 | persiana_reuniao | 0 | 1 | falso_positivo |
 
-Os arquivos da evolução incluem notebook executado, CSV fictício, árvore JSON, código Flask e SQLite, interface, validação de fotos, encaminhamento por equipe, painel, dependências e testes. Guilherme Costa é o único integrante. O pacote público não inclui banco local, fotos cadastradas nem credenciais.
+## 6. Experimento de ruído de rótulos
 
-O projeto utiliza o [repositório público existente](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao) e a [demonstração no GitHub Pages](https://guilhermedevsoftware.github.io/priorizacao-chamados-manutencao/). A primeira entrega permanece preservada como registro histórico; a evolução tem [pacote próprio v2.0.0](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v2.0.0). A demonstração pública usa somente exemplos fictícios e não hospeda o Flask nem o banco.
+A unidade de corrupção é o registro. Invertem-se apenas rótulos do treino, sem modificar X ou o teste limpo. Foram usadas 20 sementes de ruído, com taxas nominais 0%, 5%, 10%, 15%, 20%. A quantidade real é round(taxa × tamanho do treino), a mesma nos dois modos. O ruído de fronteira favorece pontos próximos à classe oposta segundo a política e protege casos com risco ou essencial. É uma hipótese artificial de desacordo, não medição de avaliadores reais.
 
-A implantação v2 foi verificada na URL pública em Chromium móvel (390 x 844): painel com quatro exemplos fixos e filtros, atualizações desabilitadas com explicação, previsões dos três casos obrigatórios e validações aprovadas, sem erros de console. A evidência está em relatorios/testes_evolucao_pages_publico.json.
+São comparados os mesmos modelos, uma árvore de profundidade limitada a 3 e uma árvore com GridSearch em profundidades 1 a 6 ou sem limite, usando quatro folds agrupados de treino ruidoso e F2. O teste limpo é reutilizado para explorar os efeitos, sem selecionar a árvore do aplicativo.
 
-O [link para abrir o notebook no Colab](https://colab.research.google.com/github/GuilhermeDevSoftware/priorizacao-chamados-manutencao/blob/main/Projeto_Chamados_Manutencao.ipynb) disponibiliza a versão do GitHub. O notebook entregue contém as saídas verificadas da execução local.
+![Sensibilidade versus ruído](../relatorios/figuras/ruido_sensibilidade.png)
 
-Para demonstrar a persistência, é necessário iniciar o Flask no computador, cadastrar um chamado, fechar o servidor e reiniciá-lo usando a mesma pasta `instance/`. Banco e uploads precisam ser mantidos juntos no backup. A entrega ao Google Classroom é realizada pelo titular; este pacote não representa envio à atividade.
+![F2 versus ruído](../relatorios/figuras/ruido_f2.png)
+
+Resumo na maior taxa nominal avaliada; média ± desvio-padrão entre sementes:
+
+| Ruído | Modelo | F2 teste limpo | Sensibilidade teste | F2 treino ruidoso |
+| --- | --- | --- | --- | --- |
+| uniforme | Dummy maioria | 0,3500 ± 0,4398 | 0,4000 ± 0,5026 | 0,3410 ± 0,4285 |
+| uniforme | Política explícita | 1,0000 ± 0,0000 | 1,0000 ± 0,0000 | 0,8098 ± 0,0115 |
+| uniforme | Árvore atual | 0,7480 ± 0,1470 | 0,7321 ± 0,1653 | 0,8706 ± 0,0573 |
+| uniforme | Regressão logística | 0,7933 ± 0,1266 | 0,7857 ± 0,1466 | 0,5977 ± 0,0820 |
+| uniforme | Random forest | 0,8664 ± 0,1143 | 0,8607 ± 0,1341 | 0,9783 ± 0,0166 |
+| uniforme | Árvore limitada | 0,7443 ± 0,1387 | 0,7286 ± 0,1513 | 0,6521 ± 0,0926 |
+| uniforme | Árvore com GridSearch | 0,7614 ± 0,1495 | 0,7500 ± 0,1695 | 0,9349 ± 0,0694 |
+| fronteira | Dummy maioria | 0,4813 ± 0,4466 | 0,5500 ± 0,5104 | 0,4732 ± 0,4393 |
+| fronteira | Política explícita | 1,0000 ± 0,0000 | 1,0000 ± 0,0000 | 0,8023 ± 0,0101 |
+| fronteira | Árvore atual | 0,8913 ± 0,0497 | 0,8857 ± 0,0672 | 0,8774 ± 0,0443 |
+| fronteira | Regressão logística | 0,8834 ± 0,0046 | 0,8607 ± 0,0160 | 0,7547 ± 0,0360 |
+| fronteira | Random forest | 0,8807 ± 0,0343 | 0,8929 ± 0,0434 | 0,9706 ± 0,0151 |
+| fronteira | Árvore limitada | 0,8824 ± 0,0000 | 0,8571 ± 0,0000 | 0,7860 ± 0,0774 |
+| fronteira | Árvore com GridSearch | 0,8773 ± 0,0435 | 0,8786 ± 0,0618 | 0,8979 ± 0,0800 |
+
+A diferença entre desempenho no treino ruidoso e no teste limpo e a frequência de profundidades selecionadas permitem discutir sobreajuste. Não se deve concluir que limitar a profundidade ou usar regressão logística sempre melhora a robustez; o resultado depende de como o erro de rótulo foi gerado. A regra explícita não aprende rótulos corrompidos e permanece uma referência favorecida pelo desenho do experimento.
+
+GridSearch, uniforme: frequências de profundidade máxima escolhida = {"sem_limite": 14, "6": 3, "4": 1, "5": 2}. A escolha usou apenas o treino ruidoso; não foi aplicada ao modelo publicado.
+
+GridSearch, fronteira: frequências de profundidade máxima escolhida = {"sem_limite": 8, "4": 2, "5": 3, "3": 4, "6": 3}. A escolha usou apenas o treino ruidoso; não foi aplicada ao modelo publicado.
+
+Fonte: [experimento_ruido.json](../relatorios/experimento_ruido.json), com todas as sementes e posições invertidas.
+
+## 7. Curva de aprendizado
+
+Subconjuntos aninhados de famílias do treino externo são avaliados em famílias externas separadas, sem usar os exemplos reservados. O menor prefixo garante as duas classes usando apenas o treino externo.
+
+| Modelo | Famílias | F2 treino | F2 validação | Sensibilidade validação |
+| --- | --- | --- | --- | --- |
+| Árvore atual | 4 | 1,0000 ± 0,0000 | 0,5624 ± 0,2913 | 0,5413 ± 0,3013 |
+| Árvore atual | 8 | 1,0000 ± 0,0000 | 0,7748 ± 0,2333 | 0,7690 ± 0,2569 |
+| Árvore atual | 12 | 0,9924 ± 0,0153 | 0,8441 ± 0,2135 | 0,8486 ± 0,2440 |
+| Árvore atual | 16 | 0,9922 ± 0,0135 | 0,8935 ± 0,1659 | 0,8908 ± 0,1845 |
+| Árvore atual | 19 | 0,9951 ± 0,0086 | 0,9763 ± 0,0513 | 0,9806 ± 0,0581 |
+| Regressão logística | 4 | 0,8053 ± 0,1847 | 0,5656 ± 0,3336 | 0,5707 ± 0,3588 |
+| Regressão logística | 8 | 0,7636 ± 0,1112 | 0,6692 ± 0,1891 | 0,6389 ± 0,2050 |
+| Regressão logística | 12 | 0,7437 ± 0,0935 | 0,6877 ± 0,1620 | 0,6563 ± 0,1783 |
+| Regressão logística | 16 | 0,7189 ± 0,0579 | 0,6997 ± 0,1473 | 0,6643 ± 0,1605 |
+| Regressão logística | 19 | 0,7433 ± 0,0309 | 0,7313 ± 0,1401 | 0,6993 ± 0,1537 |
+
+![Curva de aprendizado](../relatorios/figuras/curva_aprendizado.png)
+
+A melhora com mais famílias mede cobertura de cenários sintéticos. Não comprova que esta base seja suficiente para uso real: cada família repete uma descrição e os rótulos de prioridade já seguem uma regra conhecida. A regressão logística também tem limitação de representação de interações; aumentar a amostra não elimina automaticamente esse viés.
+
+Fonte: [curva_aprendizado.json](../relatorios/curva_aprendizado.json).
+
+## 8. Classificador textual de equipe
+
+Pipeline treinado: limpeza do sufixo de variação, TF-IDF de palavras/unigramas e bigramas em união com n-gramas de caracteres de 3 a 5, seguido de regressão logística. O vocabulário e os pesos são ajustados somente no treino de cada fold. A prioridade, números de pessoas/dias gerados, foto, ID e família não entram no classificador.
+
+| Método | Acurácia OOF | F1 macro OOF |
+| --- | --- | --- |
+| TFIDF_Logistica | 0,5083 ± 0,0473 | 0,2791 ± 0,0366 |
+| Regra_local | 0,7500 ± 0,0000 | 0,7395 ± 0,0000 |
+
+Critério anterior à integração: superar estritamente a regra local nas duas médias OOF. Regra local preservada; modelo textual permanece experimental.
+
+O modelo textual ficou abaixo da regra local: não substituiu o comportamento do Flask. Seu artefato e os testes são entregues como experimento. A baixa generalização entre famílias é um resultado relevante, favorecido por pouca diversidade textual e poucas famílias por especialidade. Não foram geradas paráfrases extras nem misturadas variações no reservado.
+
+As matrizes de confusão somam predições OOF repetidas, não novos registros independentes. A lista completa de erros e a matriz estão em [classificador_texto.json](../relatorios/classificador_texto.json) e classificador_texto_oof.csv. O teste reservado é mostrado separadamente e não decidiu a integração.
+
+| Método | Acurácia reservada | F1 macro reservado |
+| --- | --- | --- |
+| TFIDF_Logistica | 0,3333 | 0,1429 |
+| Regra_local | 1,0000 | 0,5000 |
+
+O reservado foi estratificado por prioridade, não por equipe, e só contém Hidráulica e Triagem geral. O F1 macro usa as quatro classes fixas, atribuindo zero às classes ausentes. Portanto mesmo a regra que acerta todos os registros reservados não obtém F1 macro igual a um; não se deve comparar esse número diretamente à acurácia nem usá-lo para escolher o classificador textual.
+
+![Matrizes de confusão de equipes](../relatorios/figuras/matriz_equipes.png)
+
+## 9. Ameaças à validade
+
+- **Circularidade:** o baseline de regras conhece o gerador dos rótulos. A grade deriva da mesma política. Consistência é diferente de validação externa.
+- **Amostra pequena e dependente:** variações de uma família não são observações independentes. Separação por família, IC em blocos e OOF reduzem vazamento, sem criar diversidade real.
+- **Incerteza parcial:** bootstrap condicional e desvio-padrão entre repetições não incluem mudança de domínio ou todas as decisões anteriores de projeto. O reservado já foi visto e reutilizado exploratoriamente no ruído.
+- **Ruído hipotético:** inversões artificiais e pesos de fronteira não reproduzem todos os motivos de discordância humana. Diferenças de robustez não justificam implantação.
+- **Rótulos de equipe didáticos:** não houve validação institucional independente nem anotação por múltiplos especialistas. Famílias de teste com palavras novas expõem a escassez do treino textual.
+- **Escopo:** todos os dados são fictícios. Nenhuma chamada real à OpenAI foi feita. Uma instituição parceira precisará definir critérios, anonimização, dupla rotulagem e avaliação prospectiva por grupos e períodos.
+
+## 10. Execução e preservação do protótipo
+
+O notebook incorpora código, dados e os artefatos necessários em um pacote interno e executa tudo em diretório temporário, sem upload manual e sem escrever sobre o modelo do aplicativo. As saídas foram verificadas localmente com nbclient; compatibilidade com Colab não equivale a execução no serviço Google. O relatório de execução fica em relatorios/execucao_notebook.json.
+
+Os comandos de reprodução estão no README. O arquivo modelo/arvore.json, o estimador original e a inferência JavaScript são preservados. A engenharia de fotos, SQLite, APIs e Pages está documentada em [Extras de engenharia](EXTRAS_ENGENHARIA.md). O classificador textual é apenas Flask/Python experimental; não é necessário para a demonstração estática nem muda a prioridade.
