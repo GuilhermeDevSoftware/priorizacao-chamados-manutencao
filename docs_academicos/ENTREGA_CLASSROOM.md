@@ -6,15 +6,14 @@
 
 **Integrante único:** Guilherme Costa
 
-**Prazo informado:** 20/11/2026
 
-**Versão:** v2 - fotos, equipes e SQLite local
+**Versão:** evolução de Inteligência Artificial
 
 Este documento organiza a anexação; não comprova envio ao Classroom.
 
 ## Arquivos para anexar
 
-1. O pacote ZIP da evolução v2, mantendo a estrutura de pastas.
+1. O pacote ZIP da evolução de IA, mantendo a estrutura de pastas.
 2. `Projeto_Chamados_Manutencao.ipynb`, com saídas salvas, caso a atividade exija o notebook separado.
 3. `dados/chamados_ficticios.csv`, caso a base seja exigida separadamente.
 4. `docs_academicos/RELATORIO_ACADEMICO.pdf`; a fonte Markdown está incluída.
@@ -43,5 +42,5 @@ O ZIP deve incluir código Flask, módulos SQLite e de imagens, frontend, árvor
 - Reinicie o servidor e consulte o mesmo ID para mostrar a persistência.
 - Confirme o integrante único Guilherme Costa.
 - Confira a identificação de dados fictícios e de chamadas simuladas/reais nos testes.
-- Use o pacote v2; os anexos da primeira entrega continuam históricos.
-- Faça o envio e confirme o estado **Entregue** no Google Classroom antes de 20/11/2026.
+- Use o pacote de IA e o notebook executado; os anexos anteriores permanecem históricos.
+- Faça o envio e confirme o estado **Entregue** no Google Classroom.

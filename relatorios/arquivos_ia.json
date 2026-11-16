@@ -1,0 +1,273 @@
+{
+  "referencia": "d9cb87e",
+  "arquivos": [
+    {
+      "arquivo": "Projeto_Chamados_Manutencao.ipynb",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "README.md",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "dados/chamados_ficticios.csv",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "dados/rotulagem_equipes.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "dados/rotulagem_equipes.md",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "docs_academicos/ENTREGA_CLASSROOM.md",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "docs_academicos/EXTRAS_ENGENHARIA.md",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "docs_academicos/RELATORIO_ACADEMICO.md",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "docs_academicos/RELATORIO_ACADEMICO.pdf",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "docs_academicos/ROTEIRO_DEMONSTRACAO.md",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "modelo/equipe_texto.joblib",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "modelo/equipe_texto_metadata.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/arquivos_ia.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/arvore_interpretada.txt",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/classificador_texto.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/classificador_texto.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/classificador_texto_oof.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/comparacao_modelos.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/comparacao_modelos.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/comparacao_modelos.md",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/curva_aprendizado.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/curva_aprendizado.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/divergencias_fronteiras.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/erros_oof_modelos.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/execucao_notebook.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/experimento_ruido.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/experimento_ruido.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/falsos_negativos_regioes.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/arvore_publicada.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/curva_aprendizado.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/fronteiras_arvore.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/fronteiras_logistica.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/fronteiras_randomforest.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/importancias_arvore.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/matriz_equipes.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/ruido_f2.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/figuras/ruido_sensibilidade.png",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/fronteiras.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/grade_fronteiras.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/importancias_arvore.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/interpretabilidade.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/limiares_arvore.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/predicoes_oof_modelos.csv",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "relatorios/verificacao_ia.json",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "requirements-dev.txt",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "scripts/analisar_fronteiras.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/avaliar_modelos.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/curva_aprendizado.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/empacotar_entrega.py",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "scripts/experimento_ruido.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/gerar_relatorio_ia.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/interpretar_arvore.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/ml_comum.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/montar_notebook.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "scripts/treinar.py",
+      "situacao": "alterado"
+    },
+    {
+      "arquivo": "scripts/treinar_texto.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "tests/test_avaliacao_modelos.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "tests/test_curva_aprendizado.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "tests/test_interpretacao_fronteiras.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "tests/test_notebook_ml.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "tests/test_ruido_curva.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "tests/test_texto_equipe.py",
+      "situacao": "criado"
+    },
+    {
+      "arquivo": "texto_equipe.py",
+      "situacao": "criado"
+    }
+  ],
+  "entrega": [
+    "entrega/ia/Projeto_Chamados_Manutencao_IA.zip",
+    "entrega/ia/Projeto_Chamados_Manutencao.ipynb",
+    "entrega/ia/RELATORIO_ACADEMICO.pdf",
+    "entrega/ia/SHA256SUMS.txt"
+  ],
+  "etapas": [
+    "Avaliação robusta",
+    "Interpretabilidade",
+    "Fronteiras e erros",
+    "Ruído de rótulos",
+    "Curva de aprendizado",
+    "Classificador de texto",
+    "Notebook e relatório",
+    "README e organização"
+  ]
+}

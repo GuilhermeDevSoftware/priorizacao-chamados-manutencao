@@ -1,6 +1,6 @@
 """Exporta o commit atual sem dados locais nem pacotes anteriores.
 
-Uso: python scripts/empacotar_entrega.py --saida /caminho/Entrega_v2.zip
+Uso: python scripts/empacotar_entrega.py --saida /caminho/Entrega_IA.zip
 O comando inclui somente arquivos já commitados; não lê o banco ou os uploads.
 """
 import argparse
@@ -8,7 +8,7 @@ from io import BytesIO
 from pathlib import Path, PurePosixPath
 import subprocess
 import tarfile
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUIDOS = {"entrega", "instance", "uploads", "work", "__pycache__", ".pytest_cache", ".git"}
@@ -29,8 +29,9 @@ def empacotar(saida):
                 continue
             if caminho.suffix in (".db", ".sqlite", ".sqlite3"):
                 continue
-            zipado.writestr("priorizacao-chamados-manutencao/" + membro.name,
-                            pacote.extractfile(membro).read())
+            entrada = ZipInfo("priorizacao-chamados-manutencao/" + membro.name)
+            entrada.compress_type = ZIP_DEFLATED
+            zipado.writestr(entrada, pacote.extractfile(membro).read())
             quantidade += 1
     with ZipFile(saida) as zipado:
         if zipado.testzip() is not None:
