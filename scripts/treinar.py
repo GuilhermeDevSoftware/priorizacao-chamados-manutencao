@@ -1,5 +1,5 @@
 """Geração, treino e avaliação reproduzíveis. Dados inteiramente fictícios.
-Autor: Guilherme Costa — Engenharia de Computação. Entrega: 20/11/2026.
+Autor: Guilherme Costa — Engenharia de Computação.
 Execute a partir da raiz: python scripts/treinar.py
 """
 # %% importacoes
@@ -95,7 +95,12 @@ def gerar_base():
                 "descricao": f"{descricao}. Variação fictícia {i}: {valores[2]} pessoa(s) afetada(s), {valores[3]} dia(s) de espera; recorrência {'sim' if valores[4] else 'não'}.",
                 **dict(zip(FEATURES, valores)), "prioridade": classe,
                 "justificativa_rotulo": justificativa, "origem": "fictícia"})
-    return pd.DataFrame(registros)
+    # A anotação de equipe é documental: não participa do treino de prioridade.
+    raiz_projeto = str(Path(__file__).resolve().parents[1])
+    if raiz_projeto not in sys.path:
+        sys.path.insert(0, raiz_projeto)
+    from texto_equipe import anotar_equipes
+    return anotar_equipes(pd.DataFrame(registros))
 
 # %% validacao
 
