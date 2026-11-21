@@ -38,6 +38,12 @@ def _regra(padrao, fator, estado="confirmado", *, condutor=False):
 
 EQUIPAMENTO_ELETRICO = r"(?:quadro\s+(?:eletrico|de\s+distribuicao)|painel\s+eletrico|disjuntor|tomada|circuito\s+eletrico|fiacao)"
 CONDUTOR = r"(?:fiacao|fios?|condutores?|cabos?\s+eletricos?)"
+FIO_OU_CABO = r"(?:fios?|cabos?|condutores?)"
+REDE_ELETRICA = r"(?:d[aoe]\s+(?:postes?|energia|alimentacao\s+eletrica|rede\s+eletrica|(?:alta|baixa)\s+tensao)|eletric[oa]s?)"
+QUEDA_CONDUTOR = (
+    r"(?:caiu|cairam|caid[oa]s?|rompeu|romperam|rompid[oa]s?|"
+    r"(?:esta(?:m)?|ficou|ficaram)\s+(?:n[oa]\s+(?:chao|solo)|pendurad[oa]s?)|prestes\s+a\s+cair)"
+)
 FUMACA_ELETRICA = r"(?:fumaca|faiscas?|cheiro\s+de\s+queimado|chamas)"
 CRITICAS = (
     _regra(r"\bvazamento\s+(?:de|do)\s+gas\b|\bgas\s+(?:esta\s+)?(?:vazando|escapando)\b",
@@ -50,6 +56,10 @@ CRITICAS = (
     _regra(rf"\b{CONDUTOR}\b[^,]{{0,45}}?(?:,\s*)?\b(?:expost[oa]s?|desencapad[oa]s?)\b"
            rf"|\b(?:exposicao|contato)\s+(?:com|a|de)\s+{CONDUTOR}\s+energizad[oa]s?\b",
            "Condutor elétrico exposto indica potencial risco grave de choque.", "suspeito", condutor=True),
+    _regra(rf"\b{FIO_OU_CABO}\s+{REDE_ELETRICA}\b[^,]{{0,38}}?(?:,\s*)?\b{QUEDA_CONDUTOR}\b"
+           rf"|\b{FIO_OU_CABO}\s+{QUEDA_CONDUTOR}\s+{REDE_ELETRICA}\b",
+           "Fio ou cabo da instalação elétrica no chão, rompido ou em risco de queda indica possível choque grave.",
+           "suspeito", condutor=True),
     _regra(r"\b(?:principio\s+de\s+incendio|incendio\s+(?:em|no|na|nas|nos)|incendio\s+(?:ativo|confirmado)|pegando\s+fogo|em\s+chamas)\b",
            "Há indício de incêndio em curso no local."),
     _regra(r"\b(?:teto|forro|parede|estrutura)\b[^,]{0,45}?\b(?:prestes\s+a\s+(?:cair|desabar)|desabando|em\s+colapso)\b"
@@ -61,12 +71,14 @@ CRITICAS_OPERACIONAIS = (
            r"(?:interrompid[oa]|indisponivel|suspens[oa])\b[^,]{0,40}?\b(?:sem\s+alternativa|em\s+toda\s+a\s+escola|em\s+todo\s+o\s+hospital)\b",
            "Interrupção ampla ou sem alternativa de serviço essencial."),
     _regra(r"\b(?:falta\s+(?:de\s+)?agua|sem\s+agua)\s+(?:potavel\s+)?(?:em\s+)?"
-           r"(?:toda\s+a\s+(?:escola|instituicao|unidade)|todo\s+o\s+(?:hospital|predio))\b",
+           r"(?:toda\s+a\s+(?:escola|instituicao|unidade)|todo\s+o\s+(?:hospital|predio)|"
+           r"na\s+(?:escola|instituicao|unidade)\s+inteira|no\s+(?:hospital|predio)\s+inteiro)\b",
            "O relato indica falta de água em toda a instituição, com impacto em serviço essencial."),
 )
 IMPACTOS = (
     _regra(r"\b(?:computadores?|terminais?|equipamentos?)\b[^,]{0,60}?\bsem\s+(?:acesso\s+(?:a|ao)\s+)?(?:rede|internet|conexao)\b"
-           r"|\b(?:rede|internet|conexao)\b[^,]{0,24}?\b(?:caiu|indisponivel|interrompid[oa]|fora\s+do\s+ar)\b",
+           r"|(?<!cabo\sd[aeo]\s)(?<!cabos\sd[aeo]\s)(?<!fio\sd[aeo]\s)(?<!fios\sd[aeo]\s)"
+           r"\b(?:rede|internet|conexao)\b[^,]{0,24}?\b(?:caiu|indisponivel|interrompid[oa]|fora\s+do\s+ar)\b",
            "A perda de acesso à rede afeta o funcionamento do setor."),
     _regra(r"\bvazamento\s+(?:moderado|de\s+agua|na\s+tubulacao|no\s+encanamento)\b",
            "Vazamento com impacto que exige reparo em prazo razoável."),
@@ -103,9 +115,18 @@ INCERTEZA = re.compile(
     r"\b(?:possivel|suspeita\s+de|pode\s+(?:haver|ser)|nao\s+(?:foi\s+(?:descartado|confirmado)|se\s+sabe\s+se|sabemos\s+se))"
     r"(?:\s+(?:que|ha|existe|um|uma))*\s*$"
 )
-DESENERGIZADO = re.compile(r"\b(?:desenergizad[oa]s?|(?:ja\s+)?desligad[oa]s?|nao\s+energizad[oa]s?|sem\s+tensao)\b")
+DESENERGIZADO = re.compile(
+    r"(?<!nao\s)(?<!nao\sfoi\s)(?<!nao\sesta\s)"
+    r"\b(?:desenergizad[oa]s?|desligad[oa]s?|nao\s+energizad[oa]s?|sem\s+tensao)\b"
+)
 ENERGIZADO = re.compile(r"\benergizad[oa]s?\b")
-NEGACAO_EXPOSICAO = re.compile(r"\bnao\s+(?:(?:esta|estao|estar|ficou|ficaram)\s+)?(?:expost[oa]s?|desencapad[oa]s?)\b")
+NEGACAO_CONDUTOR = re.compile(
+    rf"\bnao\s+(?:(?:esta|estao|estar|ficou|ficaram)\s+)?(?:expost[oa]s?|desencapad[oa]s?|{QUEDA_CONDUTOR})\b"
+)
+CONDUTOR_RECOLHIDO = re.compile(
+    r"^\s*(?:,\s*)?(?:(?:ontem|hoje|anteriormente|no\s+(?:chao|solo))\s+)*"
+    r"(?:(?:e|ja|depois)\s+)*(?:foi|foram)\s+(?:recolhid[oa]s?|removid[oa]s?)\b"
+)
 EXPOSICAO_AO_TEMPO = re.compile(r"^\s+a(?:o|os|s)?\s+(?:sol|chuva|intemperies|tempo)\b")
 ANTECEDENTE_ELETRICO = re.compile(rf"\b{EQUIPAMENTO_ELETRICO}\b")
 CONTINUACAO_ELETRICA = re.compile(
@@ -130,7 +151,8 @@ def _estado_mencao(clausula, ocorrencia, regra):
     if re.search(r"\bnao\s+(?:esta(?:m)?\s+)?(?:emitindo|emite|soltando|liberando|apresenta|com|sem)\b", trecho):
         return "ausente"
     if regra.condutor:
-        if NEGACAO_EXPOSICAO.search(trecho) or DESENERGIZADO.search(trecho + depois[:38]) or EXPOSICAO_AO_TEMPO.match(depois):
+        if (NEGACAO_CONDUTOR.search(trecho) or DESENERGIZADO.search(trecho + depois[:38])
+                or EXPOSICAO_AO_TEMPO.match(depois) or CONDUTOR_RECOLHIDO.match(depois)):
             return "ausente"
         if ENERGIZADO.search(trecho):
             return "confirmado"
@@ -180,6 +202,9 @@ def _avaliar_localmente(descricao, campos):
     if rotina:
         fator = "O relato descreve reparo pequeno, troca de item ou manutenção de rotina."
         return 0, fator, [fator], "ausente", False
+    if campos.get("servico_essencial_interrompido") == 1:
+        fator = "O formulário informa interrupção de serviço essencial. Confirme o alcance e se há alternativa."
+        return 1, fator, [fator], "ausente" if ausencia else "desconhecido", True
     # Só os indicadores de impacto em conjunto sustentam prioridade intermediária.
     pessoas = campos.get("pessoas_afetadas") or 0
     dias = campos.get("dias_aguardando") or 0
@@ -207,6 +232,8 @@ Não classifique por palavras isoladas. Respostas Sim/Não são complementares:
 uma resposta negativa jamais anula um possível perigo grave sustentado pelo relato.
 Uma resposta afirmativa sozinha não prova perigo. Indique revisão se o relato e o
 formulário divergirem, se faltar informação decisiva, ou se a foto for inconclusiva.
+Trate um cabo da rede elétrica caído ou rompido como suspeita de choque mesmo sem
+confirmação de que esteja energizado. Diferencie-o de cabo de rede de dados.
 
 risco_critico indica risco grave atual: confirmado quando o relato é afirmativo e
 concreto, suspeito quando há indício concreto com incerteza, ausente para relato sem
@@ -359,6 +386,13 @@ def classificar(descricao, campos, foto=None, *, chave="", modelo="gpt-4o-mini")
             revisao = True
             confianca = None
             justificativa += " Os indícios graves descritos na análise exigem triagem prioritária."
+        elif classe == 0 and classe_local == 1 and campos.get("servico_essencial_interrompido") == 1:
+            classe = 1
+            revisao = True
+            confianca = None
+            fator = "O formulário indica serviço essencial interrompido. Confirme a criticidade e se há alternativa."
+            justificativa += " " + fator
+            fatores = list(dict.fromkeys([fator, *fatores]))[:5]
 
     alerta = risco in ("confirmado", "suspeito")
     resposta_risco = campos.get("risco_seguranca")

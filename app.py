@@ -177,8 +177,9 @@ def create_app(config: dict | None = None) -> Flask:
     if config:
         app.config.update(config)
     storage.inicializar(app)
+    # Uma análise de versão anterior deve ser refeita antes de gravar o chamado.
     assinatura = URLSafeTimedSerializer(
-        app.config["PRIORIZA_CHAVE_ASSINATURA"], salt="prioriza-triagem-v1",
+        app.config["PRIORIZA_CHAVE_ASSINATURA"], salt="prioriza-triagem-v2",
         signer_kwargs={"digest_method": hashlib.sha256},
     )
 

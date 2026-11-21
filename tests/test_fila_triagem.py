@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import sqlite3
 
+from itsdangerous import URLSafeTimedSerializer
 from PIL import Image
 import pytest
 import requests
@@ -133,6 +134,50 @@ def test_casos_obrigatorios_previa_e_cadastro(cliente, descricao, risco, nivel, 
     assert registro["classificacao"]["prioridade"] == nivel
     assert registro["classificacao"]["justificativa"] == previa["justificativa"]
     assert registro["classificacao"]["alerta_seguranca"] is alerta
+
+
+@pytest.mark.parametrize("com_comprovante", [True, False], ids=["com-previa", "cadastro-direto"])
+def test_fio_de_poste_caido_em_patio_encabeca_fila(cliente, configuracao, com_comprovante):
+    teclado = aprovado(cadastrar(cliente), 201)["id"]
+    rede = aprovado(cadastrar(cliente, REDE), 201)["id"]
+    descricao = "Fio do poste de alimentação elétrica, caido no chão próximo uma poça de água."
+    dados = {**campos(descricao, risco=1), "servico_essencial_interrompido": 1, "pessoas_afetadas": 9}
+    comprovante = {}
+    if com_comprovante:
+        previa = aprovado(enviar(cliente, "/api/classificar", dados), 200)
+        assert previa["prioridade"] == 2
+        assert previa["rotulo"] == "Prioritário"
+        assert previa["alerta_seguranca"]
+        assert previa["revisao_necessaria"]
+        comprovante["comprovante"] = previa["comprovante"]
+
+    registro = aprovado(enviar(cliente, "/api/chamados", {
+        **dados, **comprovante, "local": "Pátio escolar", "confirmado": True, "equipe_confirmada": "Elétrica",
+    }), 201)
+    assert registro["prioridade_sugerida"] == registro["prioridade_atual"] == 2
+    assert registro["rotulo_prioridade"] == "Prioritário"
+    assert registro["classificacao"]["alerta_seguranca"]
+
+    persistente = aplicacao.create_app(configuracao).test_client()
+    fila = listar(persistente)
+    assert ids(fila) == [registro["id"], rede, teclado]
+    assert fila["contagens"] == {"0": 1, "1": 1, "2": 1}
+    assert fila["chamados"][0]["classificacao"]["alerta_seguranca"]
+
+
+def test_comprovante_anterior_a_correcao_forca_nova_triagem(configuracao):
+    chave = "chave-ficticia-de-assinatura"
+    cliente = aplicacao.create_app({**configuracao, "PRIORIZA_CHAVE_ASSINATURA": chave}).test_client()
+    anterior = URLSafeTimedSerializer(chave, salt="prioriza-triagem-v1",
+                                      signer_kwargs={"digest_method": aplicacao.hashlib.sha256})
+    descricao = "Fio caído do poste perto do portão da escola."
+    comprovante = anterior.dumps({
+        "entrada": aplicacao.digest_triagem(descricao, campos(descricao), None),
+        "classificacao": {"prioridade": 0},
+    })
+    registro = aprovado(cadastrar(cliente, descricao, comprovante=comprovante), 201)
+    assert registro["prioridade_atual"] == 2
+    assert registro["classificacao"]["alerta_seguranca"]
 
 
 @pytest.mark.parametrize("com_foto", [False, True], ids=["sem-foto", "com-foto"])

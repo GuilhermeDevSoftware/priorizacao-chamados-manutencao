@@ -11,6 +11,11 @@ let exemplosPainel = [], detalheAtual = null, versaoPainel = 0, versaoFoto = 0, 
 let visaoPainel = 'pendentes', assinaturaLista = '', fotoCarregando = false, atualizandoChamado = false;
 let consultasPainel = 0;
 const exemplos = {
+  poste: {
+    descricao: 'Fio do poste de alimentação elétrica, caido no chão próximo uma poça de água.', local: 'Área externa fictícia',
+    equipe: 'Elétrica', valores: [0, 0, 2, 0, 0], prioridade: 2, alerta: true, contradicao: true,
+    justificativa: 'Um fio da rede de alimentação caído perto de água indica possível risco grave de choque. A situação exige revisão da resposta negativa, mesmo sem confirmação de que o fio esteja energizado.'
+  },
   fiacao: {
     descricao: 'Fiação elétrica energizada exposta próxima a uma poça de água.', local: 'Corredor fictício',
     equipe: 'Elétrica', valores: [0, 0, 2, 0, 0], prioridade: 2, alerta: true, contradicao: true,
@@ -196,7 +201,11 @@ form.addEventListener('submit', async evento => {
       comprovante = classificacao.comprovante || null;
     } else {
       const exemplo = Object.values(exemplos).find(item => item.descricao === descricao && CAMPOS.every((c, i) => item.valores[i] === validacao.campos[c]));
-      if (!exemplo || fotoArquivo) throw new Error('Escolha um dos exemplos fictícios para pré-visualizar a triagem. A análise de uma nova descrição ou foto exige o Flask.');
+      if (!exemplo || fotoArquivo) {
+        $('#resultado').hidden = true;
+        $('#resultado-vazio').hidden = false;
+        throw new Error('Escolha um dos exemplos fictícios para pré-visualizar a triagem. A análise de uma nova descrição ou foto exige o Flask.');
+      }
       classificacao = {
         prioridade: exemplo.prioridade, justificativa: exemplo.justificativa, origem: 'demonstracao',
         contradicao: exemplo.contradicao, revisao_necessaria: exemplo.contradicao, alerta_seguranca: exemplo.alerta
@@ -575,6 +584,7 @@ async function iniciar() {
       $('#modo-titulo').textContent = 'Modo demonstração';
       $('#modo-metodo').textContent = 'Exemplos fictícios';
       $('#modo-descricao').textContent = 'Explore as três prioridades nos exemplos. Use o Flask para analisar uma nova descrição, cadastrar chamados e registrar alterações.';
+      $('#descricao-ajuda').textContent = 'Escolha um dos exemplos acima para testar a triagem nesta demonstração.';
       $('#extracao-info').textContent = 'As sugestões de descrição e foto exigem o Flask.';
       $('#painel-info').textContent = 'Fila de exemplos fictícios, ordenada por prioridade e da abertura mais antiga para a mais recente.';
       $('#privacy-text').textContent = 'Dados e fotos selecionados ficam nesta página de demonstração.';

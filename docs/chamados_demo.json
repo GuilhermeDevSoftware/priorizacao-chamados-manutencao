@@ -222,5 +222,37 @@
       "contradicao": true,
       "alerta_seguranca": false
     }
+  },
+  {
+    "id": "DEMO-08",
+    "descricao": "Fio do poste de alimentação elétrica, caido no chão próximo uma poça de água.",
+    "local": "Área externa fictícia",
+    "data_abertura": "2025-05-12T09:50:00-03:00",
+    "risco_seguranca": 0,
+    "servico_essencial_interrompido": 0,
+    "pessoas_afetadas": 2,
+    "dias_aguardando": 0,
+    "recorrente": 0,
+    "prioridade_sugerida": 2,
+    "prioridade_atual": 2,
+    "rotulo_prioridade": "Prioritário",
+    "equipe_sugerida": "Elétrica",
+    "equipe_confirmada": "Elétrica",
+    "status": "Aberto",
+    "justificativa_equipe": "O relato descreve um possível condutor da rede elétrica.",
+    "foto_url": null,
+    "analise": null,
+    "historico_alteracoes": [],
+    "classificacao": {
+      "prioridade": 2,
+      "rotulo": "Prioritário",
+      "justificativa": "Um fio da rede de alimentação caído perto de água indica possível risco grave de choque. A situação exige revisão da resposta negativa, mesmo sem confirmação de que o fio esteja energizado.",
+      "fatores": [],
+      "confianca": null,
+      "origem": "demonstracao",
+      "revisao_necessaria": true,
+      "contradicao": true,
+      "alerta_seguranca": true
+    }
   }
 ]

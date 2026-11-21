@@ -39,6 +39,19 @@ def test_casos_obrigatorios_sem_chave(descricao, risco, prioridade, alerta, cont
     assert resposta["confianca"] is None
 
 
+@pytest.mark.parametrize("descricao", [
+    "Fio do poste de alimentação elétrica, caido no chão próximo uma poça de água.",
+    "Cabo de energia se rompeu e está pendurado sobre a passagem dos alunos.",
+    "Um fio de alta tensão está no solo, perto do portão.",
+])
+def test_condutor_em_posicao_de_risco_independe_da_resposta_negativa(descricao):
+    resultado = classificar(descricao, complementos())
+    assert resultado["prioridade"] == 2
+    assert resultado["alerta_seguranca"]
+    assert resultado["contradicao"]
+    assert resultado["revisao_necessaria"]
+
+
 @pytest.mark.parametrize("descricao,esperado", [
     ("Não há um vazamento de gás. Solicito trocar uma etiqueta.", 0),
     ("Vazamento de gás da semana passada foi reparado. Solicito manutenção preventiva.", 0),
@@ -54,9 +67,25 @@ def test_casos_obrigatorios_sem_chave(descricao, risco, prioridade, alerta, cont
     ("O painel elétrico foi desligado, mas está emitindo fumaça.", 2),
     ("Não há falta de água em toda a escola. Solicito manutenção preventiva.", 0),
     ("Falta de água em toda a escola, interrompendo banheiros e refeições.", 2),
+    ("Estamos sem água no hospital inteiro.", 2),
+    ("O fio do poste não caiu no chão. Solicitamos manutenção preventiva.", 0),
+    ("O cabo de energia caiu ontem e já foi recolhido. Solicito manutenção preventiva.", 0),
+    ("O cabo de rede caiu no chão da sala. Solicito um pequeno ajuste.", 0),
 ])
 def test_contexto_polaridade_e_continuacao(descricao, esperado):
     assert classificar(descricao, complementos())["prioridade"] == esperado
+
+
+@pytest.mark.parametrize("descricao,risco", [
+    ("O equipamento parou de funcionar.", 0),
+    ("O equipamento parou de funcionar.", 1),
+    ("Não há água no bebedouro de um corredor, os outros funcionam.", 0),
+])
+def test_interrupcao_essencial_sem_criticidade_comprovada_pede_revisao(descricao, risco):
+    resultado = classificar(descricao, complementos(risco, servico_essencial_interrompido=1))
+    assert resultado["prioridade"] == 1
+    assert resultado["revisao_necessaria"]
+    assert not resultado["alerta_seguranca"]
 
 
 def resposta_ia(**dados):
@@ -95,6 +124,22 @@ def test_protecao_critica_prevalece_sobre_proposta_semantica_inadequada():
     assert resultado["alerta_seguranca"] and resultado["contradicao"] and resultado["revisao_necessaria"]
     assert resultado["confianca"] is None
     assert "regra crítica" in resultado["justificativa"]
+
+
+def test_cabo_caido_ainda_nao_desligado_mantem_alerta():
+    resultado = classificar("Cabo de energia caiu e ainda não foi desligado.", complementos())
+    assert resultado["prioridade"] == 2
+    assert resultado["alerta_seguranca"] and resultado["revisao_necessaria"]
+
+
+def test_interrupcao_essencial_informada_com_proposta_semantica_baixa_pede_revisao():
+    with patch("triagem.requests.post", return_value=resposta_ia(prioridade=0)):
+        resultado = classificar("O equipamento parou de funcionar.",
+                                complementos(servico_essencial_interrompido=1), chave="chave-ficticia")
+    assert resultado["prioridade"] == 1
+    assert resultado["revisao_necessaria"]
+    assert not resultado["alerta_seguranca"]
+    assert resultado["confianca"] is None
 
 
 def test_perigo_semantico_novo_com_evidencia_aplica_limite_critico():

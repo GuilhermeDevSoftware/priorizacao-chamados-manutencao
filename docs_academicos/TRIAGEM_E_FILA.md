@@ -30,6 +30,8 @@ O modo local é identificado como **Análise local**. Ele usa condições textua
 
 Clique em **Analisar chamado** para ver a justificativa e em **Salvar chamado** para persistir o registro. O servidor decide a classificação e registra sua origem. O arquivo acadêmico da árvore binária, o notebook e a rota `/api/prever` permanecem disponíveis para reprodução dos experimentos. A árvore não decide a fila atual.
 
+Um relato de fio da rede elétrica caído, inclusive perto de água, recebe **Prioritário** e alerta de segurança mesmo se a resposta sobre risco for **Não**. Quando a interrupção de um serviço essencial é informada e falta contexto para avaliar o alcance, o sistema sugere **Intermediário** e pede revisão. Uma troca de teclado de rotina recebe **Não prioritário**.
+
 ## Fila e alterações autorizadas
 
 A visão Pendentes inclui chamados abertos e em atendimento. A ordem é prioridade vigente decrescente, abertura crescente e, em caso de empate de horário, ID crescente. A visão Histórico reúne os concluídos. Os contadores mostram todos os pendentes por prioridade, mesmo quando há filtros. Cadastro e alteração atualizam a lista de imediato. A página visível também consulta o servidor periodicamente.
@@ -41,6 +43,8 @@ Para habilitar edição administrativa, defina `PRIORIZA_ADMIN_TOKEN` e `PRIORIZ
 ```
 
 Insira a credencial no painel apenas para atualizar um chamado. Cada alteração efetiva grava data, responsável definido no servidor, valores anteriores e novos e motivo, quando fornecido. Alterar a prioridade exige motivo. A classificação sugerida originalmente continua visível. A configuração oferece uma credencial de manutenção por instalação. Para identificar vários responsáveis em uma instalação institucional, use controle de identidade individual na infraestrutura.
+
+A correção da triagem se aplica aos novos cadastros. Para corrigir a prioridade de um chamado já registrado, abra o chamado na fila e use a edição administrativa. O histórico guarda a alteração e seu motivo.
 
 ## API e hospedagem
 

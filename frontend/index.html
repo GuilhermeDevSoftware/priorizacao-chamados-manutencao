@@ -8,7 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23173f39'/%3E%3Cpath d='m8 16 5 5 11-12' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>Prioriza · Chamados de manutenção</title>
   <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=triagem-2"></script>
 </head>
 <body>
   <a class="skip-link" href="#formulario">Ir para o formulário</a>
@@ -42,6 +42,7 @@
         <div class="example-block">
           <span class="small-label">Experimente um caso fictício</span>
           <div class="examples" aria-label="Preencher um exemplo fictício">
+            <button type="button" data-exemplo="poste">Fio caído do poste</button>
             <button type="button" data-exemplo="fiacao">Fiação perto de água</button>
             <button type="button" data-exemplo="fumaca">Quadro com fumaça</button>
             <button type="button" data-exemplo="rede">Rede indisponível</button>
@@ -52,7 +53,7 @@
           </div>
         </div>
         <form id="formulario" novalidate>
-          <div class="field description-field"><label for="descricao">Descrição do chamado</label><textarea id="descricao" name="descricao" rows="3" maxlength="2000" required placeholder="Ex.: a maçaneta de uma sala desocupada está frouxa."></textarea><span id="erro-descricao" class="field-error"></span><div class="description-footer"><span id="descricao-ajuda">Use apenas situações fictícias nesta demonstração.</span><span id="contador" aria-hidden="true">0 / 2000</span></div></div>
+          <div class="field description-field"><label for="descricao">Descrição do chamado</label><textarea id="descricao" name="descricao" rows="3" maxlength="2000" required aria-describedby="descricao-ajuda erro-descricao" placeholder="Ex.: a maçaneta de uma sala desocupada está frouxa."></textarea><span id="erro-descricao" class="field-error"></span><div class="description-footer"><span id="descricao-ajuda">Use situações fictícias durante o teste.</span><span id="contador" aria-hidden="true">0 / 2000</span></div></div>
           <div class="field location-field"><label for="local">Local do problema</label><input id="local" name="local" maxlength="200" placeholder="Ex.: corredor da escola" required><span id="erro-local" class="field-error"></span></div>
           <div class="photo-field"><span class="photo-label">Foto do chamado <span class="optional">opcional</span></span><p>JPG, PNG ou WebP · até 5 MiB. Use somente imagens fictícias na demonstração.</p><div class="photo-actions"><label class="upload-button" for="foto">Escolher foto<input id="foto" name="foto" type="file" accept="image/jpeg,image/png,image/webp"></label><label class="upload-button" for="foto-camera">Tirar foto<input id="foto-camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"></label></div><p id="foto-status" role="status"></p><div id="foto-box" hidden><img id="foto-previa" alt="Prévia da imagem selecionada para o chamado"><button type="button" id="remover-foto" class="text-button">Remover foto</button></div></div>
           <div class="extraction"><button id="extrair" type="button" class="text-button" disabled aria-describedby="extracao-info"><span aria-hidden="true">✦</span> Sugerir campos e equipe</button><p id="extracao-info">A análise de descrição e foto precisa do Flask local.</p><p id="extracao-status" role="status"></p></div>
