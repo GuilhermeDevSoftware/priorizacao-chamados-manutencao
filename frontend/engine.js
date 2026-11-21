@@ -4,7 +4,7 @@ export const CAMPOS = Object.freeze([
   'pessoas_afetadas', 'dias_aguardando', 'recorrente'
 ]);
 export const NOMES = Object.freeze({
-  risco_seguranca: 'Risco à segurança',
+  risco_seguranca: 'Risco iminente à vida',
   servico_essencial_interrompido: 'Serviço essencial interrompido',
   pessoas_afetadas: 'Pessoas afetadas',
   dias_aguardando: 'Dias de espera',

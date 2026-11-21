@@ -1,0 +1,156 @@
+{
+  "dados": "Exemplos fictícios.",
+  "pytest": {
+    "comando": "python -m pytest -q",
+    "aprovados": 185
+  },
+  "inferencias_locais": [
+    {
+      "caso": "A",
+      "descricao": "Quadro elétrico emitindo fumaça e cheiro de queimado.",
+      "risco_informado": false,
+      "prioridade_esperada": 2,
+      "resultado": {
+        "prioridade": 2,
+        "rotulo": "Prioritário",
+        "justificativa": "Fumaça, faíscas ou cheiro de queimado associado à instalação elétrica indica risco de incêndio ou choque. Resultado da análise contextual local. O indício exige atenção apesar da resposta negativa sobre risco iminente à vida.",
+        "fatores": [
+          "A resposta negativa sobre risco iminente diverge do indício grave identificado.",
+          "Fumaça, faíscas ou cheiro de queimado associado à instalação elétrica indica risco de incêndio ou choque."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": true,
+        "contradicao": true,
+        "alerta_seguranca": true
+      }
+    },
+    {
+      "caso": "B",
+      "descricao": "Computadores de um setor estão sem acesso à rede, prejudicando o trabalho.",
+      "risco_informado": false,
+      "prioridade_esperada": 1,
+      "resultado": {
+        "prioridade": 1,
+        "rotulo": "Intermediário",
+        "justificativa": "A perda de acesso à rede afeta o funcionamento do setor. Resultado da análise contextual local.",
+        "fatores": [
+          "A perda de acesso à rede afeta o funcionamento do setor.",
+          "Falha localizada prejudica equipamentos ou atividades do setor."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": true,
+        "contradicao": false,
+        "alerta_seguranca": false
+      }
+    },
+    {
+      "caso": "C",
+      "descricao": "Solicito substituição de um teclado com uma tecla defeituosa.",
+      "risco_informado": false,
+      "prioridade_esperada": 0,
+      "resultado": {
+        "prioridade": 0,
+        "rotulo": "Não prioritário",
+        "justificativa": "O relato descreve reparo pequeno, troca de item ou manutenção de rotina. Resultado da análise contextual local.",
+        "fatores": [
+          "O relato descreve reparo pequeno, troca de item ou manutenção de rotina."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": false,
+        "contradicao": false,
+        "alerta_seguranca": false
+      }
+    },
+    {
+      "caso": "D",
+      "descricao": "Vazamento de gás identificado próximo à cozinha.",
+      "risco_informado": false,
+      "prioridade_esperada": 2,
+      "resultado": {
+        "prioridade": 2,
+        "rotulo": "Prioritário",
+        "justificativa": "Relato de vazamento de gás. Resultado da análise contextual local. O indício exige atenção apesar da resposta negativa sobre risco iminente à vida.",
+        "fatores": [
+          "A resposta negativa sobre risco iminente diverge do indício grave identificado.",
+          "Relato de vazamento de gás."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": true,
+        "contradicao": true,
+        "alerta_seguranca": true
+      }
+    },
+    {
+      "caso": "E",
+      "descricao": "Foi verificado que não há vazamento de gás. É apenas necessário substituir uma etiqueta de identificação.",
+      "risco_informado": false,
+      "prioridade_esperada": 0,
+      "resultado": {
+        "prioridade": 0,
+        "rotulo": "Não prioritário",
+        "justificativa": "O relato descreve reparo pequeno, troca de item ou manutenção de rotina. Resultado da análise contextual local.",
+        "fatores": [
+          "O relato descreve reparo pequeno, troca de item ou manutenção de rotina."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": false,
+        "contradicao": false,
+        "alerta_seguranca": false
+      }
+    },
+    {
+      "caso": "F",
+      "descricao": "Solicito um pequeno ajuste em uma gaveta, sem qualquer perigo aparente.",
+      "risco_informado": true,
+      "prioridade_esperada": 0,
+      "resultado": {
+        "prioridade": 0,
+        "rotulo": "Não prioritário",
+        "justificativa": "O relato descreve reparo pequeno, troca de item ou manutenção de rotina. Resultado da análise contextual local. A resposta afirmativa sobre risco iminente diverge da descrição. Confirme se falta informar algum perigo.",
+        "fatores": [
+          "A resposta afirmativa sobre risco iminente diverge da descrição. Confirme se falta informar algum perigo.",
+          "O relato descreve reparo pequeno, troca de item ou manutenção de rotina."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": true,
+        "contradicao": true,
+        "alerta_seguranca": false
+      }
+    },
+    {
+      "caso": "Fiação e água",
+      "descricao": "Fiação elétrica energizada exposta próxima a uma poça de água.",
+      "risco_informado": false,
+      "prioridade_esperada": 2,
+      "resultado": {
+        "prioridade": 2,
+        "rotulo": "Prioritário",
+        "justificativa": "Condutor elétrico exposto indica potencial risco grave de choque. Resultado da análise contextual local. O indício exige atenção apesar da resposta negativa sobre risco iminente à vida.",
+        "fatores": [
+          "A resposta negativa sobre risco iminente diverge do indício grave identificado.",
+          "Condutor elétrico exposto indica potencial risco grave de choque."
+        ],
+        "confianca": null,
+        "origem": "analise_local",
+        "revisao_necessaria": true,
+        "contradicao": true,
+        "alerta_seguranca": true
+      }
+    }
+  ],
+  "paridade_academica": {
+    "casos": 2624,
+    "divergencias": 0,
+    "sha256_arvore": "fab3dc0c51256c048e4cc13df0311ede3af4fdbd4c671b2528d6ff07a5b63aec"
+  },
+  "openai": "Respostas simuladas em testes de contrato. Nenhuma chamada real.",
+  "verificacao_http_container": "Waitress executado. Confirmados cadastro nos três níveis, ordenação, bloqueio de PATCH sem credencial, conclusão e persistência de auditoria, foto e dados ao recriar com o mesmo volume.",
+  "interface": "Fluxos verificados em Node com DOM e API simulados. Verificação visual em navegador não efetuada neste ambiente.",
+  "notebook": "Regenerado e executado com nbclient, 10 células de código, nenhuma saída de erro."
+}

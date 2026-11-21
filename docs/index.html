@@ -31,15 +31,26 @@
       </div>
       <div class="intro-note">
         <span class="note-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 3 8 3v6c0 4-8 9-8 9S4 16 4 12V6l8-3Z" stroke="currentColor" stroke-width="1.6"/><path d="m8.5 11.5 2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <div><strong>A decisão continua humana.</strong><p>A árvore de decisão sugere uma classe. O responsável pela manutenção revisa o contexto e define a ordem de atendimento.</p></div>
+        <div><strong>A decisão continua humana.</strong><p>A triagem sugere uma prioridade e explica a decisão. O responsável pela manutenção revisa o contexto e organiza o atendimento.</p></div>
       </div>
     </section>
 
     <section id="ferramenta" class="workspace" aria-label="Ferramenta de análise">
       <div class="form-card card">
-        <div class="card-heading"><div><span class="section-kicker">NOVO CHAMADO</span><h2>Vamos entender a situação</h2></div><span class="step-count">01 / 02</span></div>
-        <p class="form-intro">Descreva, revise e encaminhe. A foto é opcional; os campos confirmados determinam a prioridade.</p>
-        <div class="example-block"><span class="small-label">Experimente um caso fictício</span><div class="examples" aria-label="Preencher um exemplo fictício"><button type="button" data-exemplo="macaneta">Maçaneta frouxa <svg aria-hidden="true" viewBox="0 0 16 16" fill="none"><path d="M4 12 12 4M4 4h8v8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" data-exemplo="agua">Falta de água <svg aria-hidden="true" viewBox="0 0 16 16" fill="none"><path d="M4 12 12 4M4 4h8v8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" data-exemplo="fiacao">Fiação exposta <svg aria-hidden="true" viewBox="0 0 16 16" fill="none"><path d="M4 12 12 4M4 4h8v8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+        <div class="card-heading"><div><span class="section-kicker">NOVO CHAMADO</span><h2>Vamos entender a situação</h2></div></div>
+        <p class="form-intro">Descreva o que aconteceu, quais atividades foram afetadas e se o problema ainda está ocorrendo. As respostas complementam a descrição.</p>
+        <div class="example-block">
+          <span class="small-label">Experimente um caso fictício</span>
+          <div class="examples" aria-label="Preencher um exemplo fictício">
+            <button type="button" data-exemplo="fiacao">Fiação perto de água</button>
+            <button type="button" data-exemplo="fumaca">Quadro com fumaça</button>
+            <button type="button" data-exemplo="rede">Rede indisponível</button>
+            <button type="button" data-exemplo="teclado">Teclado defeituoso</button>
+            <button type="button" data-exemplo="gas">Vazamento de gás</button>
+            <button type="button" data-exemplo="negacao">Vazamento descartado</button>
+            <button type="button" data-exemplo="gaveta">Gaveta com risco marcado</button>
+          </div>
+        </div>
         <form id="formulario" novalidate>
           <div class="field description-field"><label for="descricao">Descrição do chamado</label><textarea id="descricao" name="descricao" rows="3" maxlength="2000" required placeholder="Ex.: a maçaneta de uma sala desocupada está frouxa."></textarea><span id="erro-descricao" class="field-error"></span><div class="description-footer"><span id="descricao-ajuda">Use apenas situações fictícias nesta demonstração.</span><span id="contador" aria-hidden="true">0 / 2000</span></div></div>
           <div class="field location-field"><label for="local">Local do problema</label><input id="local" name="local" maxlength="200" placeholder="Ex.: corredor da escola" required><span id="erro-local" class="field-error"></span></div>
@@ -47,7 +58,7 @@
           <div class="extraction"><button id="extrair" type="button" class="text-button" disabled aria-describedby="extracao-info"><span aria-hidden="true">✦</span> Sugerir campos e equipe</button><p id="extracao-info">A análise de descrição e foto precisa do Flask local.</p><p id="extracao-status" role="status"></p></div>
           <div id="analise-detalhes" class="analysis-box" hidden aria-live="polite"></div><fieldset><legend>Informações para a análise <span>Todos os campos abaixo são obrigatórios</span></legend>
             <div class="fields-grid">
-              <div class="field"><label for="risco_seguranca">Há risco à segurança?</label><select id="risco_seguranca" name="risco_seguranca" required aria-describedby="risco-ajuda erro-risco_seguranca"><option value="">Selecione uma opção</option><option value="0">Não</option><option value="1">Sim</option></select><span id="risco-ajuda" class="field-help">Ex.: choque, queda ou ferimento.</span><span class="field-error" id="erro-risco_seguranca"></span></div>
+              <div class="field"><label for="risco_seguranca">Existe risco iminente à vida?</label><select id="risco_seguranca" name="risco_seguranca" required aria-describedby="risco-ajuda erro-risco_seguranca"><option value="">Selecione uma opção</option><option value="0">Não</option><option value="1">Sim</option></select><span id="risco-ajuda" class="field-help">Informe o que você observa. A triagem também considera os riscos descritos no texto.</span><span class="field-error" id="erro-risco_seguranca"></span></div>
               <div class="field"><label for="servico_essencial_interrompido">Serviço essencial interrompido?</label><select id="servico_essencial_interrompido" name="servico_essencial_interrompido" required aria-describedby="servico-ajuda erro-servico_essencial_interrompido"><option value="">Selecione uma opção</option><option value="0">Não</option><option value="1">Sim</option></select><span id="servico-ajuda" class="field-help">Ex.: falta de água ou energia.</span><span class="field-error" id="erro-servico_essencial_interrompido"></span></div>
               <div class="field"><label for="pessoas_afetadas">Quantas pessoas são afetadas?</label><div class="input-unit"><input id="pessoas_afetadas" name="pessoas_afetadas" type="number" inputmode="numeric" min="0" max="9007199254740991" step="1" placeholder="Ex.: 25" required aria-describedby="erro-pessoas_afetadas"><span aria-hidden="true">pessoas</span></div><span class="field-error" id="erro-pessoas_afetadas"></span></div>
               <div class="field"><label for="dias_aguardando">Há quantos dias está aguardando?</label><div class="input-unit"><input id="dias_aguardando" name="dias_aguardando" type="number" inputmode="numeric" min="0" max="9007199254740991" step="1" placeholder="Ex.: 2" required aria-describedby="dias-ajuda erro-dias_aguardando"><span aria-hidden="true">dias</span></div><span id="dias-ajuda" class="field-help">Use 0 para um chamado de hoje.</span><span class="field-error" id="erro-dias_aguardando"></span></div>
@@ -55,31 +66,80 @@
             </div>
           </fieldset>
           <section class="team-section" aria-labelledby="equipe-titulo"><h3 id="equipe-titulo">Encaminhamento</h3><p>Equipe sugerida: <strong id="equipe-sugerida">Triagem geral</strong></p><p id="justificativa-equipe">Escolha a equipe responsável após revisar o chamado.</p><div class="field"><label for="equipe_confirmada">Equipe responsável confirmada</label><select id="equipe_confirmada" required><option value="">Selecione a equipe</option><option>TI</option><option>Elétrica</option><option>Hidráulica</option><option>Triagem geral</option></select><span id="erro-equipe_confirmada" class="field-error"></span></div></section>
-          <div id="confirmacao-box" class="confirmation"><label><input id="confirmar-campos" type="checkbox"> Revisei os campos, completei as informações desconhecidas e confirmo a equipe responsável.</label><p>Confirme antes de salvar. A IA pode interpretar a descrição ou foto incorretamente; a prioridade é sugerida pela árvore.</p></div>
+          <div id="confirmacao-box" class="confirmation"><label><input id="confirmar-campos" type="checkbox"> Revisei os campos, completei as informações desconhecidas e confirmo a equipe responsável.</label><p>Confirme os dados antes de salvar. O responsável pela manutenção pode revisar a prioridade e o encaminhamento.</p></div>
           <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
-          <div class="form-actions"><button id="analisar" class="primary-button" type="submit">Analisar chamado <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="salvar" type="button" class="save-button" disabled>Salvar chamado</button><button id="limpar" type="button" class="clear-button">Limpar</button></div>
+          <div class="form-actions"><button id="analisar" class="primary-button" type="submit">Analisar chamado</button><button id="salvar" type="button" class="save-button" disabled>Salvar chamado</button><button id="limpar" type="button" class="clear-button">Limpar</button></div>
           <p id="salvar-info" class="field-help">Salvar e manter o histórico exige o Flask em execução.</p><p class="privacy-note"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="2" stroke="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor"/></svg><span id="privacy-text">Os chamados não são armazenados nesta demonstração.</span></p>
         </form>
       </div>
 
       <aside class="result-column" aria-label="Resultado da análise">
         <div class="result-card card">
-          <div class="card-heading"><div><span class="section-kicker">APOIO À DECISÃO</span><h2>Sugestão de prioridade</h2></div><span class="step-count">02 / 02</span></div>
-          <div id="resultado-vazio" class="empty-result"><div class="empty-illustration" aria-hidden="true"><svg viewBox="0 0 120 104" fill="none"><rect x="24" y="12" width="72" height="82" rx="9" fill="#f7faf8" stroke="#cbded4" stroke-width="1.5"/><rect x="43" y="7" width="34" height="13" rx="5" fill="#dcece3" stroke="#cbded4"/><path d="M42 38h36M42 50h25M42 62h30" stroke="#b5cdbf" stroke-width="3" stroke-linecap="round"/><circle cx="90" cy="78" r="18" fill="#e6efe9" stroke="#c1d7c8" stroke-width="1.5"/><path d="m83 78 5 5 9-11" stroke="#537c63" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="67" r="3" fill="#d0e0d6"/><path d="M103 30h8m-4-4v8" stroke="#c7dacc" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Pronto para analisar</h3><p>Preencha o chamado ao lado.<br>A sugestão e o resumo aparecerão aqui.</p><div class="class-tags"><span><i class="dot normal-dot" aria-hidden="true"></i>0 · Normal</span><span><i class="dot priority-dot" aria-hidden="true"></i>1 · Prioritário</span></div></div>
+          <div class="card-heading"><div><span class="section-kicker">APOIO À DECISÃO</span><h2>Sugestão de prioridade</h2></div></div>
+          <div id="resultado-vazio" class="empty-result"><div class="empty-illustration" aria-hidden="true"><svg viewBox="0 0 120 104" fill="none"><rect x="24" y="12" width="72" height="82" rx="9" fill="#f7faf8" stroke="#cbded4" stroke-width="1.5"/><rect x="43" y="7" width="34" height="13" rx="5" fill="#dcece3" stroke="#cbded4"/><path d="M42 38h36M42 50h25M42 62h30" stroke="#b5cdbf" stroke-width="3" stroke-linecap="round"/><circle cx="90" cy="78" r="18" fill="#e6efe9" stroke="#c1d7c8" stroke-width="1.5"/><path d="m83 78 5 5 9-11" stroke="#537c63" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="67" r="3" fill="#d0e0d6"/><path d="M103 30h8m-4-4v8" stroke="#c7dacc" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Pronto para analisar</h3><p>Preencha o chamado ao lado.<br>A sugestão e o resumo aparecerão aqui.</p><div class="class-tags"><span class="tier-badge tier-2">Prioritário</span><span class="tier-badge tier-1">Intermediário</span><span class="tier-badge tier-0">Não prioritário</span></div></div>
           <div id="resultado" hidden tabindex="-1" aria-labelledby="resultado-titulo">
             <div id="resultado-destaque" class="result-banner"><span class="result-caption">PRIORIDADE SUGERIDA</span><h3 id="resultado-titulo"></h3><p id="resultado-explicacao"></p></div>
+            <div id="resultado-triagem" class="triage-details"></div>
             <p id="resultado-atualizacao" class="stale-note" hidden>Os dados foram alterados. Analise novamente para atualizar a sugestão.</p>
             <div class="summary"><h3>Resumo do chamado</h3><p id="resumo-descricao"></p><dl id="resumo-campos"></dl></div>
             <div class="result-meta"><div><span>Equipe responsável</span><strong id="resultado-equipe">A confirmar</strong></div><div><span>Status</span><strong id="resultado-status">Ainda não cadastrado</strong></div></div><div class="review-note"><strong>Revise antes de encaminhar</strong><p>Considere o contexto, confirme as informações e defina a ordem de atendimento com o responsável pela manutenção.</p></div>
           </div>
         </div>
-        <div class="mode-card"><div class="mode-top"><span class="status-indicator" aria-hidden="true"></span><strong id="modo-titulo">Carregando demonstração</strong><span class="mode-badge">PROTÓTIPO</span></div><p id="modo-descricao">Verificando o modo de funcionamento.</p><div class="model-line"><span>Modelo</span><strong>Árvore de decisão</strong></div><div class="model-line"><span>Origem da base</span><strong>100% fictícia</strong></div><p class="mode-disclaimer">Para fins acadêmicos. O resultado não foi validado para uso operacional em instituições reais.</p></div>
+        <div class="mode-card"><div class="mode-top"><span class="status-indicator" aria-hidden="true"></span><strong id="modo-titulo">Carregando demonstração</strong><span class="mode-badge">PROTÓTIPO</span></div><p id="modo-descricao">Verificando o modo de funcionamento.</p><div class="model-line"><span>Triagem</span><strong id="modo-metodo">Aguardando configuração</strong></div><div class="model-line"><span>Dados de demonstração</span><strong>Fictícios</strong></div><p class="mode-disclaimer">Para fins acadêmicos. O resultado não foi validado para uso operacional em instituições reais.</p></div>
       </aside>
     </section>
-<section id="painel-chamados" class="panel card" aria-labelledby="painel-titulo"><div class="panel-heading"><div><span class="section-kicker">ACOMPANHAMENTO</span><h2 id="painel-titulo">Painel de chamados</h2></div><span id="painel-contagem" class="panel-count"></span></div><p id="painel-info" class="panel-info">Carregando chamados.</p><div class="panel-filters"><div class="field"><label for="filtro-equipe">Equipe responsável</label><select id="filtro-equipe"><option value="">Todas as equipes</option><option>TI</option><option>Elétrica</option><option>Hidráulica</option><option>Triagem geral</option></select></div><div class="field"><label for="filtro-prioridade">Prioridade</label><select id="filtro-prioridade"><option value="">Todas</option><option value="0">0 · Normal</option><option value="1">1 · Prioritário</option></select></div><div class="field"><label for="filtro-status">Status</label><select id="filtro-status"><option value="">Todos</option><option>Aberto</option><option>Em atendimento</option><option>Resolvido</option></select></div></div><p id="painel-status" role="status"></p><div id="lista-chamados" class="tickets-list"></div>
-      <section id="detalhe-chamado" class="ticket-detail" hidden tabindex="-1" aria-labelledby="detalhe-titulo"><div class="detail-header"><h3 id="detalhe-titulo">Detalhe do chamado</h3><button id="fechar-detalhe" type="button" class="clear-button">Fechar detalhe</button></div><p id="detalhe-descricao"></p><dl id="detalhe-resumo"></dl><img id="detalhe-foto" alt="Imagem anexada ao chamado" hidden><div id="detalhe-analise"></div><div class="detail-edit"><div class="field"><label for="detalhe-equipe">Equipe responsável</label><select id="detalhe-equipe"><option>TI</option><option>Elétrica</option><option>Hidráulica</option><option>Triagem geral</option></select></div><div class="field"><label for="detalhe-status">Status</label><select id="detalhe-status"><option>Aberto</option><option>Em atendimento</option><option>Resolvido</option></select></div><button id="atualizar-chamado" type="button" class="save-button">Atualizar chamado</button></div><p id="detalhe-mensagem" role="status"></p></section></section>
-    <section id="sobre" class="about" aria-labelledby="sobre-titulo"><div><span class="section-kicker">TECNOLOGIA COM PROPÓSITO</span><h2 id="sobre-titulo">Pequenas equipes.<br>Decisões mais informadas.</h2><p>Sistema Inteligente para Priorização de Chamados de Manutenção. Um projeto de Engenharia de Computação desenvolvido por <strong>Guilherme Costa</strong>.</p></div><div class="about-steps"><div><span>01</span><p><strong>Você informa o contexto</strong>Segurança, serviço essencial, pessoas afetadas, espera e recorrência.</p></div><div><span>02</span><p><strong>A árvore sugere a classe</strong>O mesmo modelo treinado é usado na API local e na demonstração.</p></div><div><span>03</span><p><strong>Uma pessoa decide</strong>A prioridade sugerida apoia a análise; a decisão cabe à instituição.</p></div></div></section>
+    <section id="painel-chamados" class="panel card" aria-labelledby="painel-titulo">
+      <div class="panel-heading">
+        <div><span class="section-kicker">ACOMPANHAMENTO</span><h2 id="painel-titulo">Fila de chamados</h2></div>
+        <span id="painel-contagem" class="panel-count"></span>
+      </div>
+      <p id="painel-info" class="panel-info">Carregando chamados.</p>
+      <div class="queue-counts" aria-label="Quantidade de chamados pendentes por prioridade">
+        <div class="queue-count tier-2"><span>Prioritários</span><strong id="contagem-2">0</strong></div>
+        <div class="queue-count tier-1"><span>Intermediários</span><strong id="contagem-1">0</strong></div>
+        <div class="queue-count tier-0"><span>Não prioritários</span><strong id="contagem-0">0</strong></div>
+      </div>
+      <div class="queue-toolbar">
+        <div class="queue-views" role="group" aria-label="Visualização da fila">
+          <button type="button" id="visao-pendentes" aria-pressed="true">Pendentes</button>
+          <button type="button" id="visao-historico" aria-pressed="false">Histórico de concluídos</button>
+        </div>
+        <button id="atualizar-painel" class="text-button" type="button" hidden>Atualizar fila</button>
+      </div>
+      <div class="panel-filters">
+        <div class="field"><label for="filtro-equipe">Setor responsável</label><select id="filtro-equipe"><option value="">Todos os setores</option><option>TI</option><option>Elétrica</option><option>Hidráulica</option><option>Triagem geral</option></select></div>
+        <div class="field"><label for="filtro-prioridade">Prioridade atual</label><select id="filtro-prioridade"><option value="">Todas</option><option value="2">Prioritário</option><option value="1">Intermediário</option><option value="0">Não prioritário</option></select></div>
+        <div class="field"><label for="filtro-status">Situação</label><select id="filtro-status"><option value="">Todas nesta visualização</option><option>Aberto</option><option>Em atendimento</option><option value="Resolvido">Concluído</option></select></div>
+      </div>
+      <p id="painel-status" role="status"></p>
+      <div id="lista-chamados" class="tickets-list" aria-label="Chamados ordenados por prioridade e abertura"></div>
+      <section id="detalhe-chamado" class="ticket-detail" hidden tabindex="-1" aria-labelledby="detalhe-titulo">
+        <div class="detail-header"><h3 id="detalhe-titulo">Detalhe do chamado</h3><button id="fechar-detalhe" type="button" class="clear-button">Fechar detalhe</button></div>
+        <p id="detalhe-descricao"></p>
+        <dl id="detalhe-resumo"></dl>
+        <div id="detalhe-triagem" class="triage-details"></div>
+        <img id="detalhe-foto" alt="Imagem anexada ao chamado" hidden>
+        <div id="detalhe-analise"></div>
+        <details id="detalhe-auditoria" class="ticket-audit" hidden>
+          <summary>Histórico de alterações</summary>
+          <ol id="detalhe-alteracoes"></ol>
+        </details>
+        <div id="detalhe-administracao" class="detail-administration" hidden>
+          <h4>Alterar atendimento</h4>
+          <div class="detail-edit">
+            <div class="field"><label for="detalhe-prioridade">Prioridade atual</label><select id="detalhe-prioridade"><option value="2">Prioritário</option><option value="1">Intermediário</option><option value="0">Não prioritário</option></select></div>
+            <div class="field"><label for="detalhe-equipe">Setor responsável</label><select id="detalhe-equipe"><option>TI</option><option>Elétrica</option><option>Hidráulica</option><option>Triagem geral</option></select></div>
+            <div class="field"><label for="detalhe-status">Situação</label><select id="detalhe-status"><option>Aberto</option><option>Em atendimento</option><option value="Resolvido">Concluído</option></select></div>
+          </div>
+          <div class="field"><label for="detalhe-motivo">Motivo da alteração</label><textarea id="detalhe-motivo" rows="2" maxlength="500" aria-describedby="motivo-ajuda"></textarea><small id="motivo-ajuda" class="field-help">Obrigatório ao mudar a prioridade.</small></div>
+          <div class="field"><label for="detalhe-credencial">Credencial do responsável</label><input id="detalhe-credencial" type="password" autocomplete="off" maxlength="512" spellcheck="false"></div>
+          <button id="atualizar-chamado" type="button" class="save-button">Registrar alteração</button>
+        </div>
+        <p id="detalhe-mensagem" role="status"></p>
+      </section>
+    </section>
+    <section id="sobre" class="about" aria-labelledby="sobre-titulo"><div><span class="section-kicker">TECNOLOGIA COM PROPÓSITO</span><h2 id="sobre-titulo">Pequenas equipes.<br>Decisões mais informadas.</h2><p>Sistema Inteligente para Priorização de Chamados de Manutenção. Um projeto de Engenharia de Computação desenvolvido por <strong>Guilherme Costa</strong>.</p></div><div class="about-steps"><div><p><strong>Você informa o contexto</strong>Descreva o problema e preencha os campos complementares.</p></div><div><p><strong>A triagem sugere a prioridade</strong>A decisão considera gravidade, impacto, regras críticas e sinais de contradição.</p></div><div><p><strong>Uma pessoa decide</strong>Um responsável autorizado pode alterar a prioridade ou a situação e registrar o motivo.</p></div></div></section>
   </main>
-  <footer><a class="brand footer-brand" href="./">prioriza<span class="brand-dot">.</span></a><p>Engenharia de Computação · Guilherme Costa · 2026</p><span>Dados fictícios. Cuidado real com as pessoas.</span></footer>
+  <footer><a class="brand footer-brand" href="./">prioriza<span class="brand-dot">.</span></a><p>Engenharia de Computação · Guilherme Costa</p></footer>
 </body>
 </html>

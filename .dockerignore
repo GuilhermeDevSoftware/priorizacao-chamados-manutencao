@@ -1,0 +1,12 @@
+*
+!Dockerfile
+!requirements-web.txt
+!app.py
+!imagens.py
+!multimodal.py
+!storage.py
+!triagem.py
+!frontend/
+!frontend/**
+!modelo/
+!modelo/arvore.json

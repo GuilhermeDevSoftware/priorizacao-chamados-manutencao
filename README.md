@@ -2,6 +2,10 @@
 
 **Engenharia de Computação · Guilherme Costa · Dados inteiramente fictícios**
 
+**Sistema de atendimento.** O Flask classifica novos chamados em **Prioritário**, **Intermediário** ou **Não prioritário**, com análise semântica opcional, regras críticas e justificativa. A fila SQLite ordena pendências por prioridade e horário, mantém o histórico e registra alterações autorizadas. Consulte [instalação, migração, credenciais e validação](docs_academicos/TRIAGEM_E_FILA.md).
+
+## Estudo acadêmico da árvore binária
+
 O protótipo sugere **Normal ou Prioritário** usando uma árvore de decisão sobre cinco campos confirmados por uma pessoa. Esta evolução estuda baselines, generalização por família, incerteza, fronteiras, ruído de rótulos, tamanho do treino e classificação de equipes por texto. A árvore publicada e a inferência no navegador permanecem preservadas.
 
 **Resultado central:** com rótulos gerados por uma política conhecida, executar a política é suficiente. ML é aqui um experimento acadêmico, sem demonstração de vantagem operacional ou validação em instituições reais.
@@ -70,7 +74,7 @@ O [guia preservado de engenharia](docs_academicos/EXTRAS_ENGENHARIA.md) reúne t
 
 [Baixar a entrega de IA](https://github.com/GuilhermeDevSoftware/priorizacao-chamados-manutencao/releases/tag/v3-ia). A [lista completa de arquivos criados e alterados](relatorios/arquivos_ia.json) identifica as mudanças por etapa.
 
-No Flask, **Salvar chamado** grava em SQLite local; **Analisar chamado** apenas prevê. A descrição pode gerar sugestões opcionais e o modelo textual experimental só usa Python. A prioridade continua usando exclusivamente os cinco campos confirmados, e a foto não entra no ML treinado.
+No Flask, **Salvar chamado** grava em SQLite e **Analisar chamado** permite consultar a decisão antes de salvar. O modelo textual de equipe permanece um experimento de Python. A interface operacional usa a triagem híbrida descrita no guia de triagem e fila.
 
 O GitHub Pages permanece uma demonstração estática com exemplos fictícios fixos; não salva cadastros nem executa o classificador textual. Banco, uploads e `.env` ficam fora do Git.
 

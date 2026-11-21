@@ -13,11 +13,13 @@ import pytest
 
 from app import create_app
 
+TOKEN_TESTE = "credencial-ficticia-de-teste"
+
 
 @pytest.fixture
 def config(tmp_path):
     return {"TESTING": True, "OPENAI_API_KEY": "", "DATABASE_PATH": str(tmp_path / "dados" / "chamados.sqlite3"),
-            "UPLOAD_FOLDER": str(tmp_path / "uploads")}
+            "UPLOAD_FOLDER": str(tmp_path / "uploads"), "PRIORIZA_ADMIN_TOKEN": TOKEN_TESTE}
 
 
 @pytest.fixture
@@ -51,6 +53,11 @@ def cadastrar(client, corpo=None, foto=None, nome="foto.jpg"):
     return client.post("/api/chamados", data=formulario, content_type="multipart/form-data")
 
 
+def editar(client, chamado_id, dados):
+    return client.patch(f"/api/chamados/{chamado_id}", json=dados,
+                        headers={"Authorization": f"Bearer {TOKEN_TESTE}"})
+
+
 def test_cadastro_cria_sqlite_e_campos_definidos_no_servidor(client, config):
     with patch("app.requests.post") as externa:
         resposta = cadastrar(client)
@@ -60,7 +67,7 @@ def test_cadastro_cria_sqlite_e_campos_definidos_no_servidor(client, config):
     assert isinstance(registro["id"], int) and registro["id"] > 0
     assert registro["status"] == "Aberto"
     assert registro["prioridade_sugerida"] == 0
-    assert registro["rotulo_prioridade"] == "Normal"
+    assert registro["rotulo_prioridade"] == "Não prioritário"
     assert registro["equipe_sugerida"] == registro["equipe_confirmada"] == "Hidráulica"
     assert registro["justificativa_equipe"]
     assert datetime.fromisoformat(registro["data_abertura"].replace("Z", "+00:00")).tzinfo is not None
@@ -73,7 +80,7 @@ def test_fiacao_com_foto_prioritaria_e_normalizacao(client, config):
     resposta = cadastrar(client, corpo, foto_sintetica("PNG", (2400, 1200)), "../../nome.png")
     assert resposta.status_code == 201, resposta.json
     registro = resposta.json
-    assert registro["prioridade_sugerida"] == 1
+    assert registro["prioridade_sugerida"] == 2
     assert registro["equipe_sugerida"] == "Elétrica"
     assert ".." not in registro["foto_caminho"]
     assert not Path(registro["foto_caminho"]).is_absolute()
@@ -101,21 +108,21 @@ def test_cenarios_sem_foto_e_sugestao_local(client, descricao, equipe):
 
 def test_correcao_manual_preserva_sugestao_e_prioridade(client):
     primeiro = cadastrar(client, dados("Computador sem conexão.", "TI")).json
-    resposta = client.patch(f"/api/chamados/{primeiro['id']}", json={"equipe_confirmada": "Elétrica", "status": "Em atendimento"})
+    resposta = editar(client, primeiro["id"], {"equipe_confirmada": "Elétrica", "status": "Em atendimento"})
     assert resposta.status_code == 200, resposta.json
     assert resposta.json["equipe_sugerida"] == "TI"
     assert resposta.json["equipe_confirmada"] == "Elétrica"
     assert resposta.json["status"] == "Em atendimento"
     assert resposta.json["prioridade_sugerida"] == primeiro["prioridade_sugerida"]
-    resolvido = client.patch(f"/api/chamados/{primeiro['id']}", json={"status": "Resolvido"})
+    resolvido = editar(client, primeiro["id"], {"status": "Resolvido"})
     assert resolvido.status_code == 200 and resolvido.json["status"] == "Resolvido"
 
 
 def test_filtros_usam_equipe_confirmada_e_intersecao(client):
-    alvo = cadastrar(client, dados("Computador com defeito.", "TI", risco=1)).json
-    cadastrar(client, dados())
-    cadastrar(client, dados("Computador com defeito.", "TI"))
-    client.patch(f"/api/chamados/{alvo['id']}", json={"equipe_confirmada": "Elétrica", "status": "Em atendimento"})
+    alvo = cadastrar(client, dados("Computadores de um setor estão sem acesso à rede, prejudicando o trabalho.", "TI")).json
+    antigo = cadastrar(client, dados()).json
+    recente = cadastrar(client, dados("Computador com defeito.", "TI")).json
+    editar(client, alvo["id"], {"equipe_confirmada": "Elétrica", "status": "Em atendimento"})
     resposta = client.get("/api/chamados", query_string={"equipe": "Elétrica", "prioridade": "1", "status": "Em atendimento"})
     assert resposta.status_code == 200, resposta.json
     assert resposta.json["total"] == 1
@@ -123,7 +130,7 @@ def test_filtros_usam_equipe_confirmada_e_intersecao(client):
     assert client.get("/api/chamados", query_string={"equipe": "TI", "prioridade": "1"}).json["total"] == 0
     lista = client.get("/api/chamados").json
     assert lista["total"] == 3
-    assert [x["id"] for x in lista["chamados"]] == sorted([x["id"] for x in lista["chamados"]], reverse=True)
+    assert [x["id"] for x in lista["chamados"]] == [alvo["id"], antigo["id"], recente["id"]]
 
 
 def test_dados_e_foto_persistem_apos_nova_instancia_flask(config):
@@ -209,14 +216,14 @@ def test_formatos_permitidos_sao_decodificados(client, formato, nome):
 @pytest.mark.parametrize("corpo", [{}, {"status": "Cancelado"}, {"equipe_confirmada": "X"}, {"prioridade_sugerida": 1}, {"descricao": "editar"}, []])
 def test_atualizacao_restrita(client, corpo):
     criado = cadastrar(client).json
-    resposta = client.patch(f"/api/chamados/{criado['id']}", json=corpo)
+    resposta = editar(client, criado["id"], corpo)
     assert resposta.status_code == 400
     assert client.get(f"/api/chamados/{criado['id']}").json == criado
 
 
 def test_inexistentes_e_foto_ausente(client):
     assert client.get("/api/chamados/99999").status_code == 404
-    assert client.patch("/api/chamados/99999", json={"status": "Resolvido"}).status_code == 404
+    assert editar(client, 99999, {"status": "Resolvido"}).status_code == 404
     assert client.get("/api/chamados/99999/foto").status_code == 404
     criado = cadastrar(client).json
     assert client.get(f"/api/chamados/{criado['id']}/foto").status_code == 404

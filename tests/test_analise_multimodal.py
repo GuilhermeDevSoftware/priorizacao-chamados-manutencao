@@ -60,6 +60,14 @@ def test_analise_so_descricao_e_armazenamento_da_sugestao(client):
     assert resposta.status_code == 200
     corpo = dados("Fiação exposta em sala fictícia.", "Triagem geral", risco=1)
     corpo["analise"] = resposta.json
+    with patch("app.requests.post", side_effect=requests.Timeout("simulado")):
+        previa = client.post(
+            "/api/classificar",
+            data={"dados": json.dumps({nome: corpo[nome] for nome in [*FEATURES, "descricao"]})},
+            content_type="multipart/form-data",
+        )
+    assert previa.status_code == 200, previa.json
+    corpo["comprovante"] = previa.json["comprovante"]
     with patch("app.requests.post") as externa:
         salvo = cadastrar(client, corpo)
     externa.assert_not_called()
@@ -82,12 +90,13 @@ def test_varias_areas_ou_incerteza_encaminham_triagem(client, areas, ambiguo):
 def test_indisponibilidade_da_ia_mantem_fallback_e_cadastro(client, falha):
     with patch("app.requests.post", side_effect=falha):
         resposta = solicitar_analise(client, data={"descricao": "Vazamento na torneira fictícia."})
+        salvo = cadastrar(client)
     assert resposta.status_code == 200
     assert resposta.json["origem"] == "regra_local"
     assert resposta.json["aviso"]
     assert resposta.json["equipe_sugerida"] == "Hidráulica"
     assert all(v is None for v in resposta.json["campos"].values())
-    assert cadastrar(client).status_code == 201
+    assert salvo.status_code == 201
 
 
 @pytest.mark.parametrize("malformado", [{}, {"campos": {}}, {**analise(), "campos": dict.fromkeys(FEATURES, True)},

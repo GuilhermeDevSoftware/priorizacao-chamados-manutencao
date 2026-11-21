@@ -24,7 +24,7 @@
     "scripts/treinar_texto.py": "22e75aeac71cbc965bf75e687e2faf4a69d69309d6406bc6aeb21e51bcb49ead",
     "texto_equipe.py": "6f50ab2a86537cd672115d8f72ff2995e4b918ccfd38294461b9dc07a2763e5f",
     "multimodal.py": "0ad206c274ab4dd5befbf7f75924757444b3a387b80c3c9cee5c88d8f47eacd1",
-    "storage.py": "bda44b1fad27fde84d66f58b36d3bc9aab23222299112a5639881fb4bf0011db",
+    "storage.py": "ea91c4cb22cc7b9de01dfaa0b67f922212930ca48c37aa27cb516028b1133772",
     "dados/chamados_ficticios.csv": "a3ea00850b8875cdd931b36417608f98510529518663981254fb97daaa76a0cc",
     "dados/divisao_treino_teste.csv": "60eb1eec5ce68068b619904a0efc606da2ca7365ec4e22600191f28d08bbd3ca",
     "modelo/arvore.json": "fab3dc0c51256c048e4cc13df0311ede3af4fdbd4c671b2528d6ff07a5b63aec",
@@ -33,7 +33,7 @@
   "artefatos_app_preservados": {
     "modelo/arvore.json": "fab3dc0c51256c048e4cc13df0311ede3af4fdbd4c671b2528d6ff07a5b63aec",
     "modelo/arvore.joblib": "cda185f9d8ed33c5c098737166f1b8a408122186946e724d92c525b5dc83c475",
-    "frontend/engine.js": "2078eadf315d713532d255714e127cbaad34c5dd477ed2bf3349d839a4a1f662"
+    "frontend/engine.js": "8b6cc35f428daef1fc9f0f6eda8e03fea7165e7ef6482e239e5964eab629530c"
   },
   "chamadas_openai": 0,
   "sementes_fixas": true,
